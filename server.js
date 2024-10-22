@@ -20,7 +20,7 @@ const pool = new Pool({
 // ฟังก์ชันสำหรับคิวรี่ข้อมูลจากฐานข้อมูล
 async function queryDatabase() {
     try {
-        const result = await pool.query('SELECT * FROM "FIFA22" LIMIT 10');
+        const result = await pool.query('SELECT * FROM "fifa22" LIMIT 10');
         return result.rows;  // คืนค่าข้อมูลที่ได้
     } catch (err) {
         console.error('เกิดข้อผิดพลาด:', err);
