@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูล FIFA22</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .data {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ข้อมูลจากตาราง FIFA22</h1>
+    <div>
+        <table class="data">
+            <thead>
+                <tr>
+                    <% if (data.length > 0) { %>
+                        <% Object.keys(data[0]).forEach((key) => { %>
+                            <th><%= key %></th>
+                        <% }); %>
+                    <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% data.forEach((row) => { %>
+                    <tr>
+                        <% Object.values(row).forEach((value) => { %>
+                            <td><%= value %></td>
+                        <% }); %>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
