@@ -38,6 +38,21 @@ async function queryDatabase(yearTable, columns) {
     }
 }
 
+async function queryNationalities() {
+    try {
+        const result = await pool.query(`
+            SELECT nationality_name AS nationality, COUNT(*) AS count 
+            FROM fifa22 
+            GROUP BY nationality_name
+        `);
+        console.log(result.rows); // แสดงข้อมูลใน terminal
+        return result.rows;
+    } catch (err) {
+        console.error('เกิดข้อผิดพลาด:', err);
+        return null;
+    }
+}
+
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
     const data = await queryDatabase();
@@ -45,7 +60,7 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/dashboard', async (req, res) => {
-    const data = await queryDatabase();
+    const data = await queryNationalities();
     res.render('dashboard', { data });
 });
 
