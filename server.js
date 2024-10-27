@@ -45,3 +45,4 @@ app.listen(PORT, () => {
 });
 
 //rqern write
+const khao ="kaho"
