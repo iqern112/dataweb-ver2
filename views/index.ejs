@@ -5,72 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FIFA(P)INFO</title>
     <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: #333;
-            color: #fff;
-        }
-        .header .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .header .nav-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        .header .nav-buttons button {
-            padding: 8px 16px;
-            border: none;
-            background-color: #555;
-            color: #fff;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .header .nav-buttons button:hover {
-            background-color: #777;
-        }
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            padding: 20px;
-            background-color: #fff;
-            border: 2px solid #333;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .popup input {
-            margin: 5px 0;
-            padding: 8px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .popup button {
-            padding: 8px 16px;
-            margin-top: 10px;
-            background-color: #333;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
-        .close-btn {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: #333;
-            cursor: pointer;
-        }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #333;
+        color: #fff;
+    }
+
+    .header .logo {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    .header .nav-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .header .nav-buttons button {
+        padding: 8px 16px;
+        border: none;
+        background-color: #555;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .header .nav-buttons button:hover {
+        background-color: #777;
+    }
+
+    /* Navbar Styles */
+    .navbar {
+        display: flex;
+        justify-content: center;
+        background-color: #444;
+        padding: 10px 0;
+    }
+
+    .navbar a {
+        color: #fff;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .navbar a:hover {
+        background-color: #666;
+    }
+
+    /* Popup Styles */
+    .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px;
+        background-color: #fff;
+        border: 2px solid #333;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .popup input {
+        margin: 5px 0;
+        padding: 8px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .popup button {
+        padding: 8px 16px;
+        margin-top: 10px;
+        background-color: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .content-section {
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+    }
+
+
     </style>
 </head>
 <body>
@@ -83,6 +122,26 @@
             <button id="loginBtn" onclick="showLoginPopup()">Login</button>
         </div>
     </div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <a href="#dashboard" onclick="showSection('dashboard')">Dashboard</a>
+        <a href="#player-info" onclick="showSection('player-info')">Player Information</a>
+    </div>
+
+
+    <!-- หน้าต่าง Dashboard -->
+    <div id="dashboard" class="content-section" style="display: none;">
+        <h2>Dashboard</h2>
+        <p>Welcome to the Dashboard!</p>
+    </div>
+
+    <!-- หน้าต่าง Player Information -->
+    <div id="player-info" class="content-section" style="display: none;">
+        <h2>Player Information</h2>
+        <p>Here you can find information about players.</p>
+    </div>
+
     <!-- Popup สำหรับเข้าสู่ระบบ -->
     <div id="loginPopup" class="popup">
         <h3>เข้าสู่ระบบ</h3>
@@ -90,20 +149,6 @@
         <input type="text" id="username" placeholder="Username">
         <input type="password" id="password" placeholder="Password">
         <button onclick="login()">Submit</button>
-    </div>
-
-    <!-- Dropdown สำหรับเลือกปี -->
-    <div class="layer2">
-        <select id="yearSelect" onchange="fetchDataByYear()">
-            <option value="fifa22">ปี 2022</option>
-            <option value="fifa21">ปี 2021</option>
-        </select>
-        <div id="dataContainer">
-            <canvas id="chart1" width="400" height="200"></canvas>
-            <canvas id="chart2" width="400" height="200"></canvas>
-            <canvas id="chart3" width="400" height="200"></canvas>
-            <canvas id="chart4" width="400" height="200"></canvas>
-        </div>
     </div>
 
     <script>
@@ -150,55 +195,26 @@
             document.getElementById('loginPopup').style.display = 'none';
         }
 
-        async function fetchDataByYear() {
-            const year = document.getElementById("yearSelect").value;
-            fetch(`/data/${year}`)
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("dataContainer");
-                    container.innerHTML = ""; // ล้างข้อมูลเก่า
-
-                    // สร้างกราฟ 4 กราฟ
-                    createChart("chart1", data, "overall", "Overall Ratings");
-                    createChart("chart2", data, "pace", "Pace");
-                    createChart("chart3", data, "shooting", "Shooting");
-                    createChart("chart4", data, "passing", "Passing");
-                })
-                .catch(error => console.error('Error:', error));
-        }
-
-        function createChart(chartId, data, property, label) {
-            const ctx = document.getElementById(chartId).getContext('2d');
-            const values = data.map(player => player[property]);
-
-            new Chart(ctx, {
-                type: 'bar', // สามารถเปลี่ยนเป็น 'line', 'pie', 'doughnut', หรือ 'radar' ได้ตามต้องการ
-                data: {
-                    labels: data.map(player => player.short_name), // ใช้ชื่อผู้เล่นเป็น label
-                    datasets: [{
-                        label: label,
-                        data: values,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
+        function showSection(sectionId) {
+            // ซ่อนทุกเนื้อหาส่วน
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.style.display = 'none';
             });
+
+            // แสดงเฉพาะส่วนที่เลือก
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+                localStorage.setItem('currentSection', sectionId);
+            }
         }
 
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentSection = localStorage.getItem('currentSection') || 'dashboard'; // ดึงค่าจาก localStorage
+            showSection(currentSection); // แสดงส่วนที่เก็บไว้หรือ Dashboard โดยเริ่มต้น
+        });
 
-        window.onload = function() {
-            const savedYear = localStorage.getItem("selectedYear") || "fifa22"; // ดึงปีที่บันทึกหรือใช้ปี 2022 เป็นค่าเริ่มต้น
-            document.getElementById("yearSelect").value = savedYear; // ตั้งค่า dropdown ให้แสดงปีที่บันทึก
-            fetchDataByYear(); // เรียกข้อมูลตามปีที่บันทึก
-        };
     </script>
 
 </body>

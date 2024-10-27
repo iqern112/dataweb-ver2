@@ -20,14 +20,10 @@ const pool = new Pool({
 
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูลตาม table ที่ส่งมา
-async function queryDatabase(yearTable) {
-    if (!yearTable) {
-        console.error('yearTable is undefined');
-        return null;
-    }
-
+async function queryDatabase() {
     try {
-        const result = await pool.query(`SELECT * FROM "${yearTable}" LIMIT 10`);
+        // คิวรีเฉพาะคอลัมน์ที่จำเป็น
+        const result = await pool.query(`SELECT 'fifa22' LIMIT 10`);
         return result.rows;
     } catch (err) {
         console.error('เกิดข้อผิดพลาด:', err);
@@ -38,16 +34,8 @@ async function queryDatabase(yearTable) {
 
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
-    const yearTable = 'fifa22';
-    const data = await queryDatabase(yearTable);
+    const data = await queryDatabase();
     res.render('index', { data });
-});
-
-// Route สำหรับข้อมูลปีที่เลือก
-app.get('/data/:yearTable', async (req, res) => {
-    const yearTable = req.params.yearTable;
-    const data = await queryDatabase(yearTable);
-    res.json(data || { error: 'ไม่พบข้อมูล' });
 });
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
