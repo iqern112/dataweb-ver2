@@ -14,8 +14,17 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // สร้าง pool การเชื่อมต่อกับ PostgreSQL
+const user = process.env.DB_USER;
+const password = process.env.DB_PASSWORD;
+const host = process.env.DB_HOST;
+const port = process.env.DB_PORT;
+const database = process.env.DB_NAME;
+
+const connectionString = `postgresql://${user}:${password}@${host}:${port}/${database}`;
+
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    // connectionString: process.env.DATABASE_URL,
+    connectionString: connectionString,
 });
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูลจากฐานข้อมูล
