@@ -1,54 +1,57 @@
-// master
-// server.js
-
 const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
 require('dotenv').config();
 
-// สร้างแอปพลิเคชัน Express
 const app = express();
+app.use(express.json());
 
-// กำหนดให้ใช้ EJS เป็น view engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// สร้าง pool การเชื่อมต่อกับ PostgreSQL
-const user = process.env.DB_USER;
-const password = process.env.DB_PASSWORD;
-const host = process.env.DB_HOST;
-const port = process.env.DB_PORT;
-const database = process.env.DB_NAME;
-
-const connectionString = `postgresql://${user}:${password}@${host}:${port}/${database}`;
-
+// การเชื่อมต่อฐานข้อมูล PostgreSQL
 const pool = new Pool({
-    // connectionString: process.env.DATABASE_URL,
-    connectionString: connectionString,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
 });
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูลจากฐานข้อมูล
 async function queryDatabase() {
     try {
         const result = await pool.query('SELECT * FROM "fifa22" LIMIT 10');
-        return result.rows;  // คืนค่าข้อมูลที่ได้
+        return result.rows;
     } catch (err) {
         console.error('เกิดข้อผิดพลาด:', err);
         return null;
     }
 }
 
-// Route สำหรับแสดงข้อมูล
+// Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
-    const data = await queryDatabase();  // คิวรี่ข้อมูล
-    if (data) {
-        res.render('index', { data });  // เรนเดอร์เทมเพลตพร้อมข้อมูล
-    } else {
-        res.send("เกิดข้อผิดพลาดในการคิวรี่ข้อมูล");
+    const data = await queryDatabase();
+    res.render('index', { data });
+});
+
+// Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE username = $1 AND password = $2', [username, password]);
+        
+        if (result.rows.length > 0) {
+            res.json({ success: true });
+        } else {
+            res.json({ success: false });
+        }
+    } catch (err) {
+        console.error('เกิดข้อผิดพลาด:', err);
+        res.json({ success: false });
     }
 });
 
-// เริ่มเซิร์ฟเวอร์
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
