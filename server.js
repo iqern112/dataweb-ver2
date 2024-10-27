@@ -38,7 +38,8 @@ async function queryDatabase(yearTable) {
 
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
-    const data = await queryDatabase();
+    const yearTable = 'fifa22';
+    const data = await queryDatabase(yearTable);
     res.render('index', { data });
 });
 
