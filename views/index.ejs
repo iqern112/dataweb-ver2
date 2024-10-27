@@ -4,26 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อมูล FIFA22</title>
-    <link rel="stylesheet" href="views\css\style.css">
     <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        /* สไตล์ Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header .nav-buttons button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #555;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .header .nav-buttons button:hover {
+            background-color: #777;
+        }
+
+        /* สไตล์ตาราง */
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         table, th, td {
             border: 1px solid black;
         }
+
         th, td {
             padding: 8px;
             text-align: left;
         }
+
         .data {
             margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <h1>ข้อมูลจากตาราง FIFA22 อิอิ</h1>
+
+    <!-- ส่วน Header -->
+    <div class="header">
+        <div class="logo">ชื่อเว็บไซต์</div>
+        <div class="nav-buttons">
+            <!-- ปุ่มแสดงสถานะผู้ใช้งาน -->
+            <button id="statusBtn">Guest</button>
+            <!-- ปุ่มเข้าสู่ระบบ -->
+            <button onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <h1>Fifa Game players information</h1>
     <div>
         <table class="data">
             <thead>
@@ -46,5 +99,17 @@
             </tbody>
         </table>
     </div>
+
+    <script>
+        // ตัวอย่างการกำหนดสถานะผู้ใช้
+        let userStatus = "Guest"; // ค่าดีฟอลต์เป็น Guest
+        
+        // ฟังก์ชันสำหรับการเข้าสู่ระบบ
+        function login() {
+            userStatus = userStatus === "Guest" ? "Admin" : "Guest";
+            document.getElementById("statusBtn").innerText = userStatus;
+        }
+    </script>
+
 </body>
 </html>
