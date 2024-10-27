@@ -8,6 +8,7 @@ app.use(express.json());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // การเชื่อมต่อฐานข้อมูล PostgreSQL
 const pool = new Pool({
@@ -20,14 +21,16 @@ const pool = new Pool({
 
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูลตาม table ที่ส่งมา
-async function queryDatabase(yearTable) {
+async function queryDatabase(yearTable, columns) {
     if (!yearTable) {
         console.error('yearTable is undefined');
         return null;
     }
 
+    const selectedColumns = columns && columns.length > 0 ? columns.join(', ') : '*';
+
     try {
-        const result = await pool.query(`SELECT * FROM "${yearTable}" LIMIT 10`);
+        const result = await pool.query(`SELECT ${selectedColumns} FROM "${yearTable}" LIMIT 10`);
         return result.rows;
     } catch (err) {
         console.error('เกิดข้อผิดพลาด:', err);
@@ -35,11 +38,15 @@ async function queryDatabase(yearTable) {
     }
 }
 
-
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
     const data = await queryDatabase();
     res.render('index', { data });
+});
+
+app.get('/dashboard', async (req, res) => {
+    const data = await queryDatabase();
+    res.render('dashboard', { data });
 });
 
 // Route สำหรับข้อมูลปีที่เลือก
@@ -48,6 +55,7 @@ app.get('/data/:yearTable', async (req, res) => {
     const data = await queryDatabase(yearTable);
     res.json(data || { error: 'ไม่พบข้อมูล' });
 });
+
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
 app.post('/login', async (req, res) => {
