@@ -19,11 +19,15 @@ const pool = new Pool({
 });
 
 
-// ฟังก์ชันสำหรับคิวรี่ข้อมูลตาม table ที่ส่งมา
-async function queryDatabase() {
+// ฟังก์ชันสำหรับคิวรี่ข้อมูล nationality
+async function queryNationalities() {
     try {
-        // คิวรีเฉพาะคอลัมน์ที่จำเป็น
-        const result = await pool.query(`SELECT 'fifa22' LIMIT 10`);
+        const result = await pool.query(`
+            SELECT nationality_name, COUNT(*) AS count 
+            FROM fifa22 
+            GROUP BY nationality_name
+        `);
+        console.log(result.rows); // แสดงข้อมูลใน terminal
         return result.rows;
     } catch (err) {
         console.error('เกิดข้อผิดพลาด:', err);
@@ -34,8 +38,8 @@ async function queryDatabase() {
 
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
-    const data = await queryDatabase();
-    res.render('index', { data });
+    const data = await queryNationalities(); // คิวรีข้อมูล nationality
+    res.render('index', { data }); // ส่งข้อมูลไปยังหน้า index
 });
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
@@ -52,6 +56,17 @@ app.post('/login', async (req, res) => {
     } catch (err) {
         console.error('เกิดข้อผิดพลาด:', err);
         res.json({ success: false });
+    }
+});
+
+// Route สำหรับดึงข้อมูล nationality สำหรับกราฟ
+app.get('/get-nationalities', async (req, res) => {
+    try {
+        const nationalities = await queryNationalities();
+        res.json(nationalities); // ส่งข้อมูลเป็น JSON
+    } catch (err) {
+        console.error('เกิดข้อผิดพลาด:', err);
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
     }
 });
 
