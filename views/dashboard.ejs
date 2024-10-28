@@ -34,17 +34,17 @@
         <div class="stats">
             <div class="stat-box">
                 <h2>Total Player</h2>
-                <div id="totalDisplay">xxxxxx</div> <!-- Element สำหรับแสดงผลลัพธ์ -->
+                <div id="totalDisplay"></div> <!-- Element สำหรับแสดงผลลัพธ์ -->
             </div>
 
             <div class="stat-box">
                 <h2>Total Player</h2>
-                <div id="growthrateDisplay">xxxxxx</div> <!-- Element สำหรับแสดงผลลัพธ์ -->
+                <div id="growthrateDisplay"></div> <!-- Element สำหรับแสดงผลลัพธ์ -->
             </div>
 
             <div class="stat-box">
                 <h2>Total Player</h2>
-                <div class="countDisplay">xxxxxx</div> <!-- Element สำหรับแสดงผลลัพธ์ -->
+                <div class="countDisplay"></div> <!-- Element สำหรับแสดงผลลัพธ์ -->
             </div>
         </div>
 
@@ -64,6 +64,7 @@
                 console.error('Error fetching data:', error);
             }
         }
+        
         function updateTotalDisplay(data) {
             const countDisplay = document.getElementById('totalDisplay'); // Element สำหรับแสดงผลลัพธ์
             if (data && data.length > 0) {
@@ -75,6 +76,7 @@
 
         function growthrateDisplay(data) {
             const countDisplay = document.getElementById('growthrateDisplay'); // Element สำหรับแสดงผลลัพธ์
+
             let calculate = (data[0].count-data[1].count) / data[1].count * 100
             
             const growthRate = calculate.toFixed(2) 
