@@ -75,9 +75,9 @@
 
         function growthrateDisplay(data) {
             const countDisplay = document.getElementById('growthrateDisplay'); // Element สำหรับแสดงผลลัพธ์
-            let calculate = (data[0].count-data[1].count) / data[1].count
+            let calculate = (data[0].count-data[1].count) / data[1].count * 100
             
-            const growthRate = calculate.toFixed(2) * 100
+            const growthRate = calculate.toFixed(2) 
             console.log(growthRate)
             if (data && data.length > 0) {
                 countDisplay.textContent = `${growthRate}`; // แสดงจำนวนผู้เล่น
