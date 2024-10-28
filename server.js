@@ -71,6 +71,16 @@ app.get('/data/:yearTable', async (req, res) => {
     res.json(data || { error: 'ไม่พบข้อมูล' });
 });
 
+app.get('/get-nationalities', async (req, res) => {
+    try {
+        const nationalities = await queryNationalities();
+        res.json(nationalities); // ส่งข้อมูลเป็น JSON
+    } catch (err) {
+        console.error('เกิดข้อผิดพลาด:', err);
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
+    }
+});
+
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
 app.post('/login', async (req, res) => {
