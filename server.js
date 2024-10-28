@@ -20,25 +20,37 @@ const pool = new Pool({
 
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูล nationality
-async function queryNationalities() {
-    try {
-        const result = await pool.query(`
-            SELECT nationality_name, COUNT(*) AS count 
-            FROM fifa22 
-            GROUP BY nationality_name
-        `);
-        console.log(result.rows); // แสดงข้อมูลใน terminal
-        return result.rows;
-    } catch (err) {
-        console.error('เกิดข้อผิดพลาด:', err);
-        return null;
-    }
+async function querydata() {
 }
 
+app.get('/api/dashboard/:year', (req, res) => {
+    const year = req.params.year;
+    const tableName = `fifa${year}`;
+
+    const query = `
+        SELECT 
+            COUNT(*) AS totalPlayers,
+            MAX(overall) AS avgMaxOverall,
+            COUNT(DISTINCT club_name) AS teamCount
+        FROM ${tableName};
+    `;
+
+    db.query(query, (err, results) => {
+        if (err) throw err;
+        
+        res.json({
+            totalPlayers: results[0].totalPlayers,
+            avgMaxOverall: results[0].avgMaxOverall,
+            yearComparison: 'เพิ่มขึ้น 10%', // ข้อมูลนี้สามารถคำนวณได้เพิ่มในภายหลัง
+            teamCount: results[0].teamCount,
+            playerEachLevel: { "1": 20, "2": 10 } // ข้อมูลตัวอย่าง
+        });
+    });
+});
 
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
-    const data = await queryNationalities(); // คิวรีข้อมูล nationality
+    const data = await querydata(); // คิวรีข้อมูล nationality
     res.render('index', { data }); // ส่งข้อมูลไปยังหน้า index
 });
 
@@ -59,16 +71,9 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Route สำหรับดึงข้อมูล nationality สำหรับกราฟ
-app.get('/get-nationalities', async (req, res) => {
-    try {
-        const nationalities = await queryNationalities();
-        res.json(nationalities); // ส่งข้อมูลเป็น JSON
-    } catch (err) {
-        console.error('เกิดข้อผิดพลาด:', err);
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
-    }
-});
+
+
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

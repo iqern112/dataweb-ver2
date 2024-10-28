@@ -109,6 +109,57 @@
         margin-top: 10px;
     }
 
+    #yearselect {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    }
+
+    #yearDropdown {
+        padding: 8px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    #yearselect {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    }
+
+    #yearDropdown {
+        padding: 8px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    #blockinformation {
+        display: flex;
+        gap: 10px;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .info-box {
+        flex: 1;
+        padding: 20px;
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .wide-box {
+        flex: 2; /* ทำให้กล่องนี้มีขนาดเป็นสองเท่าของกล่องทางด้านซ้าย */
+    }
+
 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -133,11 +184,24 @@
 
     <!-- หน้าต่าง Dashboard -->
     <div id="dashboard" class="content-section" style="display: none;">
-        <h2>Dashboard</h2>
-        <p>Welcome to the Dashboard!</p>
         
-        <!-- เพิ่ม Canvas สำหรับกราฟวงกลม -->
-        <canvas id="nationalityChart" width="400" height="400"></canvas>
+        <div id="yearselect">
+            <h2>Dashboard</h2>
+            <select id="yearDropdown">
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <!-- เพิ่มปีอื่น ๆ ตามที่ต้องการ -->
+            </select>
+        </div>
+        <div id="blockinformation">
+            <div id="Total Player" class="info-box">Total Player</div>
+            <div id="Avg Max Overall/Age" class="info-box">Avg Max Overall/Age</div>
+            <div id="Current Year / Previous Year" class="info-box">Current Year / Previous Year</div>
+            <div id="Teams" class="info-box">Teams</div>
+            <div id="Player Each Level" class="info-box wide-box">Player Each Level</div>
+        </div>
+        <div>
+        
     </div>
 
 
@@ -214,64 +278,11 @@
                 localStorage.setItem('currentSection', sectionId);
             }
         }
-
-        // ฟังก์ชันเพื่อสร้างกราฟวงกลม
-        async function createNationalityChart() {
-            const response = await fetch('/get-nationalities'); // API ที่จะดึงข้อมูล
-            const data = await response.json(); // ดึงข้อมูล JSON
-
-            const labels = data.map(item => item.nationality_name); // ดึงชื่อประเทศ
-            const counts = data.map(item => item.count); // ดึงจำนวนผู้เล่นในแต่ละประเทศ
-
-            const ctx = document.getElementById('nationalityChart').getContext('2d');
-            const nationalityChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Nationality Distribution',
-                        data: counts,
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Nationality Distribution'
-                        }
-                    }
-                }
-            });
-        }
-
+        
         document.addEventListener('DOMContentLoaded', async () => {
             const currentSection = localStorage.getItem('currentSection') || 'dashboard'; // ดึงค่าจาก localStorage
             showSection(currentSection); // แสดงส่วนที่เก็บไว้หรือ Dashboard โดยเริ่มต้น
-
-            await createNationalityChart(); // เรียกใช้ฟังก์ชันสร้างกราฟวงกลม
         });
-
 
     </script>
 
