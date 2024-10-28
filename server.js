@@ -71,7 +71,7 @@ app.get('/data/:yearTable', async (req, res) => {
     res.json(data || { error: 'ไม่พบข้อมูล' });
 });
 
-app.get('/get-nationalities', async (req, res) => {
+app.get('/dashboard', async (req, res) => {
     try {
         const nationalities = await queryNationalities();
         res.json(nationalities); // ส่งข้อมูลเป็น JSON
