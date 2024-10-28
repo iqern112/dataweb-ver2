@@ -38,12 +38,11 @@ async function queryDatabase(yearTable, columns) {
     }
 }
 
-async function queryNationalities() {
+async function queryPlayers(yearTable) {
     try {
         const result = await pool.query(`
-            SELECT nationality_name AS nationality, COUNT(*) AS count 
-            FROM fifa22 
-            GROUP BY nationality_name
+            SELECT COUNT(*) AS count 
+            FROM "${yearTable}"
         `);
         console.log(result.rows); // แสดงข้อมูลใน terminal
         return result.rows;
@@ -60,25 +59,9 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/dashboard', async (req, res) => {
-    const data = await queryNationalities();
+    const data = await queryPlayers(yearTable);
+    console.log('ข้อมูลผู้เล่น:', data);
     res.render('dashboard', { data });
-});
-
-// Route สำหรับข้อมูลปีที่เลือก
-app.get('/data/:yearTable', async (req, res) => {
-    const yearTable = req.params.yearTable;
-    const data = await queryDatabase(yearTable);
-    res.json(data || { error: 'ไม่พบข้อมูล' });
-});
-
-app.get('/get-nationalities', async (req, res) => {
-    try {
-        const nationalities = await queryNationalities();
-        res.json(nationalities); // ส่งข้อมูลเป็น JSON
-    } catch (err) {
-        console.error('เกิดข้อผิดพลาด:', err);
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
-    }
 });
 
 
