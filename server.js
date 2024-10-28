@@ -33,11 +33,11 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     const queries = {
         totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
         avgMaxOverallAge: `SELECT AVG(overall) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
-        // currentYearComparison: `
-        //     SELECT 
-        //         (SELECT COUNT(*) FROM ${tableName}) AS currentYear,
-        //         (SELECT COUNT(*) FROM fifa${fft - 1}) AS previousYear
-        // `,
+        currentYearComparison: `
+            SELECT 
+                (SELECT COUNT(*) FROM ${tableName}) AS currentYear,
+                (SELECT COUNT(*) FROM fifa${fft - 1}) AS previousYear
+        `,
         teamsCount: `SELECT COUNT(DISTINCT club_name) AS teamsCount FROM ${tableName}`,
         playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level`
     };
@@ -45,13 +45,14 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     try {
         const totalPlayersResult = await pool.query(queries.totalPlayers);
         const avgMaxOverallAgeResult = await pool.query(queries.avgMaxOverallAge);
-        // const currentYearComparisonResult = await db.query(queries.currentYearComparison);
+        const currentYearComparisonResult = await pool.query(queries.currentYearComparison);
         const teamsCountResult = await pool.query(queries.teamsCount);
         const playerEachLevelResult = await pool.query(queries.playerEachLevel);
 
         const dashboardData = {
             totalPlayers: totalPlayersResult.rows[0]?.totalplayers || 'N/A',
             avgMaxOverallAge: avgMaxOverallAgeResult.rows[0]?.avgmaxoverallage || 'N/A',
+            currentYearComparison: `${currentYearComparisonResult.rows[0]?.currentyear || 'N/A'} / ${currentYearComparisonResult.rows[0]?.previousyear || 'N/A'}`,
             teamsCount: teamsCountResult.rows[0]?.teamscount || 'N/A',
             playerEachLevel: playerEachLevelResult.rows.map(row => 
                 `${row.league_level || 'No level'}: ${row.playercount || 0}`
@@ -70,6 +71,7 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 
 // Route แสดงข้อมูลหน้าแรก

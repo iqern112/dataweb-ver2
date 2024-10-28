@@ -306,7 +306,7 @@
                 .then(data => {
                     document.getElementById('totalPlayers').innerText = `Total Players: ${data.totalPlayers}`;
                     document.getElementById('avgMaxOverallAge').innerText = `Avg Max Overall Age: ${data.avgMaxOverallAge}`;
-                    // document.getElementById('currentYearComparison').innerText = `Current Year / Previous Year: ${data.currentYearComparison}`;
+                    document.getElementById('currentYearComparison').innerText = `Current Year / Previous Year: ${data.currentYearComparison}`;
                     document.getElementById('teamsCount').innerText = `Teams Count: ${data.teamsCount}`;
                     document.getElementById('playerEachLevel').innerText = `Player Count by League Level: ${data.playerEachLevel}`;
                 })
