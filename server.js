@@ -21,7 +21,7 @@ const pool = new Pool({
 
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูลตาม table ที่ส่งมา
-async function queryDatabase(yearTable = "fifa22", columns) {
+async function queryDatabase(yearTable, columns) {
     if (!yearTable) {
         console.error('yearTable is undefined');
         return null;
@@ -75,15 +75,38 @@ app.get('/dashboard', async (req, res) => {
 
 app.get('/dashboard/data/:year', async (req, res) => {
     const year = req.params.year;
-    const sql = `SELECT COUNT(*) AS count FROM ${year}`; // แก้ไขเป็นตารางตามปี
+
+    // แยกปีออกมาเพื่อหาปีที่ลดลง
+    const currentYear = parseInt(year.replace('fifa', ''), 10);
+    const previousYear = `fifa${currentYear - 1}`;
+
+    // สร้าง query ที่รวมข้อมูลจากทั้งสองตาราง
     try {
-        const result = await pool.query(sql);
-        const data = result.rows || []; // กำหนดค่าให้ data เป็น array ว่างหากไม่มีข้อมูล
-        console.log(data); // แสดงข้อมูลใน console
-        res.json(data); // ส่งข้อมูลเป็น JSON
+        // Query จากปีปัจจุบัน
+        const sqlCurrent = `SELECT COUNT(*) AS count FROM ${year}`;
+        const resultCurrent = await pool.query(sqlCurrent);
+        const dataCurrent = resultCurrent.rows[0] || { count: 0 }; // ค่าจาก query ปีปัจจุบัน
+
+        let dataPrevious;
+
+        try {
+            // Query สำหรับปีที่ลดลง
+            const sqlPrevious = `SELECT COUNT(*) AS count FROM ${previousYear}`;
+            const resultPrevious = await pool.query(sqlPrevious);
+            dataPrevious = resultPrevious.rows[0] || { count: 0 };
+        } catch (error) {
+            console.warn(`Table ${previousYear} does not exist. Using data from ${year} only.`);
+            dataPrevious = null; // กรณีไม่มีตารางของปีที่ลดลง
+        }
+
+        // สร้างผลลัพธ์รวม
+        const responseData = dataPrevious ? [dataCurrent, dataPrevious] : [dataCurrent, dataCurrent];
+
+        console.log(responseData);
+        res.json(responseData); // ส่งข้อมูลกลับ
     } catch (error) {
         console.error('Error fetching data:', error);
-        res.status(500).send([]); // ส่ง array ว่างในกรณีที่เกิดข้อผิดพลาด
+        res.status(500).send([]); 
     }
 });
 
