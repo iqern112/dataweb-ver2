@@ -18,35 +18,59 @@ const pool = new Pool({
     database: process.env.DB_NAME,
 });
 
-
 // ฟังก์ชันสำหรับคิวรี่ข้อมูล nationality
 async function querydata() {
+
 }
 
-app.get('/api/dashboard/:year', (req, res) => {
+// Endpoint to get dashboard data based on year
+app.get('/api/dashboard-data/:year', async (req, res) => {
     const year = req.params.year;
-    const tableName = `fifa${year}`;
+    const fft = year.slice(-2);
+    const tableName = `fifa${fft}`;
+    console.log("api 01");
 
-    const query = `
-        SELECT 
-            COUNT(*) AS totalPlayers,
-            MAX(overall) AS avgMaxOverall,
-            COUNT(DISTINCT club_name) AS teamCount
-        FROM ${tableName};
-    `;
+    const queries = {
+        totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
+        avgMaxOverallAge: `SELECT AVG(overall) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
+        // currentYearComparison: `
+        //     SELECT 
+        //         (SELECT COUNT(*) FROM ${tableName}) AS currentYear,
+        //         (SELECT COUNT(*) FROM fifa${fft - 1}) AS previousYear
+        // `,
+        teamsCount: `SELECT COUNT(DISTINCT club_name) AS teamsCount FROM ${tableName}`,
+        playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level`
+    };
 
-    db.query(query, (err, results) => {
-        if (err) throw err;
-        
-        res.json({
-            totalPlayers: results[0].totalPlayers,
-            avgMaxOverall: results[0].avgMaxOverall,
-            yearComparison: 'เพิ่มขึ้น 10%', // ข้อมูลนี้สามารถคำนวณได้เพิ่มในภายหลัง
-            teamCount: results[0].teamCount,
-            playerEachLevel: { "1": 20, "2": 10 } // ข้อมูลตัวอย่าง
-        });
-    });
+    try {
+        const totalPlayersResult = await pool.query(queries.totalPlayers);
+        const avgMaxOverallAgeResult = await pool.query(queries.avgMaxOverallAge);
+        // const currentYearComparisonResult = await db.query(queries.currentYearComparison);
+        const teamsCountResult = await pool.query(queries.teamsCount);
+        const playerEachLevelResult = await pool.query(queries.playerEachLevel);
+
+        const dashboardData = {
+            totalPlayers: totalPlayersResult.rows[0]?.totalplayers || 'N/A',
+            avgMaxOverallAge: avgMaxOverallAgeResult.rows[0]?.avgmaxoverallage || 'N/A',
+            teamsCount: teamsCountResult.rows[0]?.teamscount || 'N/A',
+            playerEachLevel: playerEachLevelResult.rows.map(row => 
+                `${row.league_level || 'No level'}: ${row.playercount || 0}`
+            ).join(', ')
+        };
+        console.log('Total Players:', totalPlayersResult.rows);
+        console.log('Avg Max Overall Age:', avgMaxOverallAgeResult.rows);
+        console.log('Teams Count:', teamsCountResult.rows);
+        console.log('Player Each Level:', playerEachLevelResult.rows);
+
+
+        console.log(dashboardData); // แสดงข้อมูลบน Terminal
+        res.json(dashboardData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
 });
+
 
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
@@ -70,10 +94,6 @@ app.post('/login', async (req, res) => {
         res.json({ success: false });
     }
 });
-
-
-
-
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
