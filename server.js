@@ -24,7 +24,7 @@ const pool = new Pool({
 async function queryDatabase(yearTable = "fifa22", columns) {
     if (!yearTable) {
         console.error('yearTable is undefined');
-        return yearTable = "fifa22";
+        return null;
     }
 
     const selectedColumns = columns && columns.length > 0 ? columns.join(', ') : '*';
@@ -61,8 +61,8 @@ app.get('/data/:year', async (req, res) => {
 app.get('/dashboard', async (req, res) => {
     try {
         // เริ่มต้นด้วยปี 2022
-        const year = 'fifa22'; // กำหนดปีเริ่มต้น
-        const sql = `SELECT COUNT(*) AS count FROM ${year}`;
+        const year = "fifa22"; // กำหนดปีเริ่มต้น
+        const sql = `SELECT * FROM "${year}" LIMIT 10`;
         const result = await pool.query(sql);
 
         const data = result.rows || []; // กำหนดค่าให้ data เป็น array ว่างหากไม่มีข้อมูล
