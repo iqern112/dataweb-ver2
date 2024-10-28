@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Document</title>
+    
+</head>
+<body>
+
+    <div class="layer2">
+        <select id="yearSelect" onchange="fetchDataByYear()">
+            <option value="fifa22">ปี 2022</option>
+            <option value="fifa21">ปี 2021</option>
+        </select>
+    </div>
+
+
+    <h1>Pie Chart</h1>
+    <div style="width: 25%; height: 25%">
+        <canvas id="myPieChart"></canvas>
+    </div>
+
+    <div style="width: 25%; height: 25%">
+        <canvas id="myPieChart2"></canvas>
+    </div>
+
+    
+</body>
+</html>
