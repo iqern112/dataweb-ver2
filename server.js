@@ -23,8 +23,22 @@ const pool = new Pool({
 //khao
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูล nationality
-async function querydata() {
+async function queryDatabase(yearTable, columns) {
+    if (!yearTable) {
+        console.error('yearTable is undefined');
+        return null;
+    }
 
+    const selectedColumns = columns && columns.length > 0 ? columns.join(', ') : '*';
+    const year = yearTable
+
+    try {
+        const result = await pool.query(`SELECT * FROM "${year}" LIMIT 10`);
+        return result.rows;
+    } catch (err) {
+        console.error('เกิดข้อผิดพลาด:', err);
+        return null;
+    }
 }
 
 // Endpoint to get dashboard data based on year
@@ -32,7 +46,6 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     const year = req.params.year;
     const fft = year.slice(-2);
     const tableName = `fifa${fft}`;
-    console.log(year);
 
     const queries = {
         totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
@@ -72,7 +85,6 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
             ).join(', ')
         };
 
-        console.log(dashboardData); // แสดงข้อมูลบน Terminal
         res.json(dashboardData);
     } catch (err) {
         console.error(err);
@@ -117,31 +129,15 @@ app.get('/api/player-data/:year', async (req, res) => {
 // Route แสดงข้อมูลหน้าแรก
 //khao
 app.get('/', async (req, res) => {
-    const data = await querydata(); // คิวรีข้อมูล nationality
+    const data = await queryDatabase(); // คิวรีข้อมูล nationality
     res.render('index', { data }); // ส่งข้อมูลไปยังหน้า index
-});
-//khao
-
-//khao
-app.get('/dashboard', async (req, res) => {
-    try {
-        // เริ่มต้นด้วยปี 2022
-        const year = "fifa22"; // กำหนดปีเริ่มต้น
-        const sql = `SELECT * FROM "${year}" LIMIT 10`;
-        const result = await pool.query(sql);
-
-        const data = result.rows || []; // กำหนดค่าให้ data เป็น array ว่างหากไม่มีข้อมูล
-        res.render('dashboard', { data, year }); // ส่งข้อมูลไปยัง EJS
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        res.status(500).render('dashboard', { data: [], year: 'fifa22' });
-    }
 });
 //khao
 
 //khao
 app.get('/dashboard/data/:year', async (req, res) => {
     const year = req.params.year;
+    console.log(year, "/dashboard/data/:year")
 
     // แยกปีออกมาเพื่อหาปีที่ลดลง
     const currentYear = parseInt(year.replace('fifa', ''), 10);
