@@ -4,22 +4,22 @@ window.onload = function() {
 };
 
 async function fetchDataByYear() {
-  const year = document.getElementById('yearSelect').value
+  const year = document.getElementById('yearDropdown').value
   try {
       const response = await fetch(`/dashboard/data/${year}`);
       if (!response.ok) {
           throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      updateTotalDisplay(data);
-      growthrateDisplay(data)
+      // updateTotalDisplay(data);
+      // growthrateDisplay(data)
   } catch (error) {
       console.error('Error fetching data:', error);
   }
 }
 
 async function fetchDataChart() {
-  const year = document.getElementById('yearSelect').value
+  const year = document.getElementById('yearDropdown').value
   console.log(year)
   try {
       const response = await fetch(`/get-chart/${year}`);
@@ -186,4 +186,4 @@ function createLineChart(data) {
   });
 }
 
-document.getElementById('yearSelect').addEventListener('change', fetchDataChart);
+document.getElementById('yearDropdown').addEventListener('change', fetchDataChart);
