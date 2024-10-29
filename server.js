@@ -76,35 +76,6 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     }
 });
 
-app.post('/filter', async (req, res) => {
-    const { columns, searchInput, position, year } = req.body;
-
-    // เลือกตารางตามปีที่เลือก
-    let tableName = year === '2022' ? 'fifa22' : 'fifa21';
-
-    // สร้าง SQL query
-    let query = 'SELECT ' + columns.join(', ') + ' FROM ' + tableName + ' WHERE 1=1';
-
-    // เพิ่มเงื่อนไขค้นหาชื่อผู้เล่น
-    if (searchInput) {
-        query += ` AND short_name ILIKE '%${searchInput}%'`;
-    }
-
-    // เพิ่มเงื่อนไขตำแหน่ง
-    if (position) {
-        query += ` AND player_positions = '${position}'`;
-    }
-
-    try {
-        const result = await pool.query(query);
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error executing query');
-    }
-});
-
-
 
 // Endpoint to get player data based on year for initial display
 app.get('/api/player-data/:year', async (req, res) => {
