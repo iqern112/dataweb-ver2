@@ -8,8 +8,11 @@ app.use(express.json());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static('public'));
 
 // การเชื่อมต่อฐานข้อมูล PostgreSQL
+//khao
 const pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -17,6 +20,7 @@ const pool = new Pool({
     port: process.env.DB_PORT,
     database: process.env.DB_NAME,
 });
+//khao
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูล nationality
 async function querydata() {
@@ -76,36 +80,6 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     }
 });
 
-app.post('/filter', async (req, res) => {
-    const { columns, searchInput, position, year } = req.body;
-
-    // เลือกตารางตามปีที่เลือก
-    let tableName = year === '2022' ? 'fifa22' : 'fifa21';
-
-    // สร้าง SQL query
-    let query = 'SELECT ' + columns.join(', ') + ' FROM ' + tableName + ' WHERE 1=1';
-
-    // เพิ่มเงื่อนไขค้นหาชื่อผู้เล่น
-    if (searchInput) {
-        query += ` AND short_name ILIKE '%${searchInput}%'`;
-    }
-
-    // เพิ่มเงื่อนไขตำแหน่ง
-    if (position) {
-        query += ` AND player_positions = '${position}'`;
-    }
-
-    try {
-        const result = await pool.query(query);
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Error executing query');
-    }
-});
-
-
-
 // Endpoint to get player data based on year for initial display
 app.get('/api/player-data/:year', async (req, res) => {
     const year = req.params.year;
@@ -141,10 +115,130 @@ app.get('/api/player-data/:year', async (req, res) => {
 
 
 // Route แสดงข้อมูลหน้าแรก
+//khao
 app.get('/', async (req, res) => {
     const data = await querydata(); // คิวรีข้อมูล nationality
     res.render('index', { data }); // ส่งข้อมูลไปยังหน้า index
 });
+//khao
+
+//khao
+app.get('/dashboard', async (req, res) => {
+    try {
+        // เริ่มต้นด้วยปี 2022
+        const year = "fifa22"; // กำหนดปีเริ่มต้น
+        const sql = `SELECT * FROM "${year}" LIMIT 10`;
+        const result = await pool.query(sql);
+
+        const data = result.rows || []; // กำหนดค่าให้ data เป็น array ว่างหากไม่มีข้อมูล
+        res.render('dashboard', { data, year }); // ส่งข้อมูลไปยัง EJS
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).render('dashboard', { data: [], year: 'fifa22' });
+    }
+});
+//khao
+
+//khao
+app.get('/dashboard/data/:year', async (req, res) => {
+    const year = req.params.year;
+
+    // แยกปีออกมาเพื่อหาปีที่ลดลง
+    const currentYear = parseInt(year.replace('fifa', ''), 10);
+    const previousYear = `fifa${currentYear - 1}`;
+
+    // สร้าง query ที่รวมข้อมูลจากทั้งสองตาราง
+    try {
+        // Query จากปีปัจจุบัน
+        const sqlCurrent = `SELECT COUNT(*) AS count FROM ${year}`;
+        const resultCurrent = await pool.query(sqlCurrent);
+        const dataCurrent = resultCurrent.rows[0] || { count: 0 }; // ค่าจาก query ปีปัจจุบัน
+
+        let dataPrevious;
+
+        try {
+            // Query สำหรับปีที่ลดลง
+            const sqlPrevious = `SELECT COUNT(*) AS count FROM ${previousYear}`;
+            const resultPrevious = await pool.query(sqlPrevious);
+            dataPrevious = resultPrevious.rows[0] || { count: 0 };
+        } catch (error) {
+            console.warn(`Table ${previousYear} does not exist. Using data from ${year} only.`);
+            dataPrevious = null; // กรณีไม่มีตารางของปีที่ลดลง
+        }
+
+        // สร้างผลลัพธ์รวม
+        const responseData = dataPrevious ? [dataCurrent, dataPrevious] : [dataCurrent, dataCurrent];
+
+        res.json(responseData); // ส่งข้อมูลกลับ
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).send([]); 
+    }
+});
+//khao
+
+//khao
+app.get('/get-chart/:year', async (req, res) => {
+    const year = req.params.year;
+    try {
+        let pieData;
+        let lineData;
+        let barData;
+        let doughnutData;
+
+        try {
+            const sqlPie = `SELECT club_name, COUNT(*) AS player_count
+                                FROM ${year}
+                                WHERE club_name IS NOT NULL
+                                GROUP BY club_name
+                                ORDER BY player_count DESC
+                                LIMIT 5;`;
+            let result = await pool.query(sqlPie);
+            pieData = result.rows || [];
+
+            const sqlLine = `SELECT ROUND(AVG(wage_eur)::NUMERIC, 2) AS average_wage_eur, overall
+                            FROM ${year}
+                            GROUP BY overall
+                            ORDER BY overall DESC LIMIT 100`;
+            result = await pool.query(sqlLine);
+            lineData = result.rows || [];
+
+            const sqlBar = `SELECT nationality_name, COUNT(*) AS player_count
+                                FROM ${year}
+                                GROUP BY nationality_name
+                                ORDER BY player_count DESC
+                                LIMIT 5; `;
+            result = await pool.query(sqlBar);
+            barData = result.rows || [];
+
+            const sqlDoughnut = `SELECT club_position, COUNT(club_position) AS counts
+                            FROM ${year}
+                            WHERE club_position IS NOT NULL
+                            GROUP BY club_position
+                            ORDER BY counts DESC
+                            LIMIT 10;`;
+            result = await pool.query(sqlDoughnut);
+            doughnutData = result.rows || [];
+
+        } catch (error) {
+            console.error('Error fetching data in /get-char:', error);
+            dataPrevious = null; // กรณีไม่มีตารางของปีที่ลดลง
+        }
+
+        const responseData = { 
+            pieData: pieData || [], 
+            lineData: lineData || [], 
+            barData: barData || [], 
+            doughnutData: doughnutData || [] 
+        };
+
+        res.json(responseData); // ส่งข้อมูลกลับ
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).render('index', { data: [] });
+    }
+});
+//khao
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
 app.post('/login', async (req, res) => {
