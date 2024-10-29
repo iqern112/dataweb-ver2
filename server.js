@@ -28,41 +28,45 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     const year = req.params.year;
     const fft = year.slice(-2);
     const tableName = `fifa${fft}`;
-    console.log("api 01");
+    console.log(year);
 
     const queries = {
         totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
         avgMaxOverallAge: `SELECT AVG(overall) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
-        currentYearComparison: `
-            SELECT 
-                (SELECT COUNT(*) FROM ${tableName}) AS currentYear,
-                (SELECT COUNT(*) FROM fifa${fft - 1}) AS previousYear
-        `,
+        currentYearComparison: async () => {
+            const currentYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft}')`);
+            const previousYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft - 1}')`);
+            
+            const currentYear = currentYearExists.rows[0].exists
+                ? (await pool.query(`SELECT COUNT(*) FROM ${tableName}`)).rows[0].count
+                : 'none';
+            
+            const previousYear = previousYearExists.rows[0].exists
+                ? (await pool.query(`SELECT COUNT(*) FROM fifa${fft - 1}`)).rows[0].count
+                : 'none';
+    
+            return { currentYear, previousYear };
+        },
         teamsCount: `SELECT COUNT(DISTINCT club_name) AS teamsCount FROM ${tableName}`,
         playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level`
     };
-
+    
     try {
         const totalPlayersResult = await pool.query(queries.totalPlayers);
         const avgMaxOverallAgeResult = await pool.query(queries.avgMaxOverallAge);
-        const currentYearComparisonResult = await pool.query(queries.currentYearComparison);
+        const currentYearComparisonResult = await queries.currentYearComparison();
         const teamsCountResult = await pool.query(queries.teamsCount);
         const playerEachLevelResult = await pool.query(queries.playerEachLevel);
-
+    
         const dashboardData = {
             totalPlayers: totalPlayersResult.rows[0]?.totalplayers || 'N/A',
             avgMaxOverallAge: avgMaxOverallAgeResult.rows[0]?.avgmaxoverallage || 'N/A',
-            currentYearComparison: `${currentYearComparisonResult.rows[0]?.currentyear || 'N/A'} / ${currentYearComparisonResult.rows[0]?.previousyear || 'N/A'}`,
+            currentYearComparison: `${currentYearComparisonResult.currentYear} / ${currentYearComparisonResult.previousYear}`,
             teamsCount: teamsCountResult.rows[0]?.teamscount || 'N/A',
             playerEachLevel: playerEachLevelResult.rows.map(row => 
                 `${row.league_level || 'No level'}: ${row.playercount || 0}`
             ).join(', ')
         };
-        console.log('Total Players:', totalPlayersResult.rows);
-        console.log('Avg Max Overall Age:', avgMaxOverallAgeResult.rows);
-        console.log('Teams Count:', teamsCountResult.rows);
-        console.log('Player Each Level:', playerEachLevelResult.rows);
-
 
         console.log(dashboardData); // แสดงข้อมูลบน Terminal
         res.json(dashboardData);
@@ -72,6 +76,9 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     }
 });
 
+app.get('/api/player-data/:year', async (req, res) => {
+
+});
 
 
 // Route แสดงข้อมูลหน้าแรก
