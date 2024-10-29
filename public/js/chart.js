@@ -1,6 +1,6 @@
 window.onload = function() {
   fetchDataByYear();
-  fetchDataChart(); // เรียกใช้ทันทีที่หน้าโหลด
+  fetchDataChart(); // เรียกใช้ทันทีที่หน้าโหลด js sorting
 };
 
 async function fetchDataByYear() {
@@ -27,14 +27,16 @@ async function fetchDataChart() {
       }
       const data = await response.json();
       console.log(data," bar.js");
-      createBarChart();
-      createPieChart();
+      createBarChart(data.barData);
+      createPieChart(data.pieData);
+      createDoughnutChart(data.doughnutData);
+      createLineChart(data.lineData);
   } catch (error) {
       console.error('Error fetching data:', error);
   }
 }
 
-function createBarChart() {
+function createBarChart(data) {
   const ctx = document.getElementById('barChart');
 
   if (Chart.getChart("barChart")) {
@@ -104,6 +106,64 @@ function createPieChart(data) {
         }
     }
     });
+}
+
+
+function createDoughnutChart(data) {
+  const ctx = document.getElementById('doughnutChart');
+
+  if (Chart.getChart("doughnutChart")) {
+    Chart.getChart("doughnutChart").destroy();
+  }
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: [
+        'Red',
+        'Blue',
+        'Yellow'
+      ],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [300, 50, 100],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(54, 162, 235)',
+          'rgb(255, 205, 86)'
+        ],
+        hoverOffset: 4
+      }]
+    },
+    options: {
+
+    }
+  });
+}
+
+function createLineChart(data) {
+  const ctx = document.getElementById('lineChart');
+
+  if (Chart.getChart("lineChart")) {
+    Chart.getChart("lineChart").destroy();
+  }
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ["a","b","c","d","e","f","g"],
+      datasets: [{
+        label: 'My First Dataset',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        fill: false,
+        borderColor: 'rgb(75, 192, 192)',
+        tension: 0.1
+      }]
+    },
+    options: {
+      
+    }
+  });
 }
 
 document.getElementById('yearSelect').addEventListener('change', fetchDataChart);

@@ -121,7 +121,7 @@ app.get('/get-chart/:year', async (req, res) => {
         let doughnutData;
 
         try {
-            const sqlPie = `SELECT COUNT(*) AS count FROM ${year}`;
+            const sqlPie = `SELECT nationality_name AS count FROM ${year}`;
             let result = await pool.query(sqlPie);
             pieData = result.rows || [];
 
