@@ -9,6 +9,7 @@ app.use(express.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static('public'));
 
 // การเชื่อมต่อฐานข้อมูล PostgreSQL
 const pool = new Pool({
@@ -107,6 +108,52 @@ app.get('/dashboard/data/:year', async (req, res) => {
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).send([]); 
+    }
+});
+
+//ดึงข้อมูลให้ chart
+app.get('/get-chart/:year', async (req, res) => {
+    const year = req.params.year;
+    try {
+        let pieData;
+        let lineData;
+        let barData;
+        let doughnutData;
+
+        try {
+            const sqlPie = `SELECT COUNT(*) AS count FROM ${year}`;
+            let result = await pool.query(sqlPie);
+            pieData = result.rows || [];
+
+            const sqlLine = `SELECT COUNT(*) AS count FROM ${year}`;
+            result = await pool.query(sqlLine);
+            lineData = result.rows || [];
+
+            const sqlBar = `SELECT COUNT(nation_position) AS count FROM ${year}`;
+            result = await pool.query(sqlBar);
+            barData = result.rows || [];
+
+            const sqlDoughnut = `SELECT COUNT(DISTINCT league_name) AS count FROM ${year}`;
+            result = await pool.query(sqlDoughnut);
+            doughnutData = result.rows || [];
+
+        } catch (error) {
+            console.error('Error fetching data in /get-char:', error);
+            dataPrevious = null; // กรณีไม่มีตารางของปีที่ลดลง
+        }
+
+        const responseData = { 
+            pieData: pieData || [], 
+            lineData: lineData || [], 
+            barData: barData || [], 
+            doughnutData: doughnutData || [] 
+        };
+
+        console.log(responseData);
+        res.json(responseData); // ส่งข้อมูลกลับ
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).render('index', { data: [] });
     }
 });
 

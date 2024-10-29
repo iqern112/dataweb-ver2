@@ -10,9 +10,10 @@
 </head>
 
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <div>
         <div class="layer2">
-            <select id="yearSelect" onchange="fetchDataByYear()">
+            <select id="yearSelect" onchange="fetchDataByYear();">
                 <option value="fifa22">ปี 2022</option>
                 <option value="fifa21">ปี 2021</option>
                 <option value="fifa20">ปี 2020</option>
@@ -39,40 +40,26 @@
                 <div class="countDisplay"> 0</div> <!-- Element สำหรับแสดงผลลัพธ์ -->
             </div>
         </div>
-        <div>
-            <canvas id="myChart"></canvas>
-        </div>
-        <div class="container chart">
-            
-            <div class="grid-item">Grid 2
+        <div class="container chart-grid"> 
+            <div class="grid-item">
+                <canvas id="barChart"></canvas>
+            </div>
+            <div class="grid-item">
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="grid-item">
 
             </div>
-            <div class="grid-item">Grid 3
-
-            </div>
-            <div class="grid-item">Grid 4
+            <div class="grid-item">
 
             </div>
         </div>
 
     </div>
 
+
+    <script src="/js/fetchByYear.js"></script>
     <script>
-        async function fetchDataByYear() {
-            const year = document.getElementById('yearSelect').value
-            try {
-                const response = await fetch(`/dashboard/data/${year}`);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                updateTotalDisplay(data);
-                growthrateDisplay(data)
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-        
         function updateTotalDisplay(data) {
             const countDisplay = document.getElementById('totalDisplay'); // Element สำหรับแสดงผลลัพธ์
             if (data && data.length > 0) {
@@ -96,8 +83,7 @@
             }
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/public/js/bar.js"></script>
+    <script src="/js/chart.js"></script>
 </body>
 
 </html>
