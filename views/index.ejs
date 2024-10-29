@@ -212,51 +212,68 @@
 
     <!-- หน้าต่าง Player Information -->
     <div id="playerinfo" class="content-section" style="display: none;">
+
             <div id="yearselect">
                 <h2>Player Information</h2>
-                <select id="yearDropdown">
+                <select id="yearDropdownplayerinfo">
                     <option value="2022">2022</option>
                     <option value="2021">2021</option>
                     <!-- เพิ่มปีอื่น ๆ ตามที่ต้องการ -->
                     
                 </select>
             </div>
-        
+        <!-- Container สำหรับแบ่งกล่อง Filter และ Data -->
+        <div id="filter-data-container" style="display: flex; gap: 20px; margin-top: 20px;">
 
-             <!-- Container สำหรับแบ่งกล่อง Filter และ Data -->
-            <div id="filter-data-container" style="display: flex; gap: 20px; margin-top: 20px;">
-                
-                <!-- กล่อง Filter -->
-                <div id="filter-box" style="flex: 1; padding: 20px; background-color: #e0e0e0; border-radius: 5px;">
-                    <h3>Filter/Search Data</h3>
-                    <input type="text" id="searchInput" placeholder="Search Player" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
-                    
-                    <label for="positionFilter">Position:</label>
-                    <select id="positionFilter" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
-                        <option value="">All</option>
-                        <option value="Forward">Forward</option>
-                        <option value="Midfielder">Midfielder</option>
-                        <option value="Defender">Defender</option>
-                        <option value="Goalkeeper">Goalkeeper</option>
-                    </select>
-                    
-                    <label for="overallRating">Overall Rating:</label>
-                    <input type="range" id="overallRating" min="0" max="100" value="50" style="width: 100%;">
-                    <span id="ratingValue">50</span>
-                    
-                    <button onclick="applyFilter()" style="margin-top: 10px; padding: 8px 16px; background-color: #333; color: #fff; border: none; cursor: pointer; border-radius: 5px;">Apply Filter</button>
+            <!-- กล่อง Filter -->
+            <div id="filter-box" style="flex: 1; padding: 20px; background-color: #e0e0e0; border-radius: 5px;">
+        
+                <!-- ตัวเลือกคอลัมน์ข้อมูล -->
+                <h3>Select Columns to Display</h3>
+                <div id="columnSelection" style="max-height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 8px; border-radius: 5px;">
+                    <input type="checkbox" id="checkbox_sofifa_id" name="columns" value="sofifa_id" checked> sofifa_id<br>
+                    <input type="checkbox" id="checkbox_short_name" name="columns" value="short_name" checked> short_name<br>
+                    <input type="checkbox" id="checkbox_long_name" name="columns" value="long_name" checked> long_name<br>
+                    <input type="checkbox" id="checkbox_club_position" name="columns" value="player_positions" checked> player_positions<br>
+                    <input type="checkbox" id="checkbox_overall" name="columns" value="overall" checked> overall<br>
+                    <input type="checkbox" id="checkbox_value_eur" name="columns" value="value_eur" checked> value_eur<br>
+                    <input type="checkbox" id="checkbox_wage_eur" name="columns" value="wage_eur" checked> wage_eur<br>
+                    <input type="checkbox" id="checkbox_club_name" name="columns" value="club_name" checked> club_name<br>
+                    <input type="checkbox" id="checkbox_age" name="columns" value="age" checked> age<br>
+                    <input type="checkbox" id="checkbox_nationality_name" name="columns" value="nationality_name" checked> nationality_name<br>
                 </div>
-                
-                <!-- กล่องแสดงผลข้อมูล -->
-                <div id="data-display-box" style="flex: 2; padding: 20px; background-color: #f9f9f9; border-radius: 5px; border: 1px solid #ccc;">
-                    <h3>Filtered Data</h3>
-                    <div id="playerDataList">
-                        <!-- ข้อมูลผู้เล่นจะถูกแสดงที่นี่ -->
-                        <p>No data available. Apply a filter to see results.</p>
-                    </div>
+
+        
+                <h3>Filter/Search Data</h3>
+        
+                <!-- Input ค้นหาชื่อผู้เล่น -->
+                <input type="text" id="searchInput" placeholder="Search Player Name" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
+        
+                <!-- ตัวเลือกตำแหน่ง -->
+                <label for="positionFilter">Position:</label>
+                <select id="positionFilter" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
+                    <option value="">All</option>
+                    <option value="Forward">Forward</option>
+                    <option value="Midfielder">Midfielder</option>
+                    <option value="Defender">Defender</option>
+                    <option value="Goalkeeper">Goalkeeper</option>
+                </select>
+        
+        
+                <!-- ปุ่ม Apply Filter -->
+                <button onclick="applyFilter()" style="margin-top: 10px; padding: 8px 16px; background-color: #333; color: #fff; border: none; cursor: pointer; border-radius: 5px;">Apply Filter</button>
+            </div>
+        
+            <!-- กล่องแสดงผลข้อมูล -->
+            <div id="data-display-box" style="flex: 2; padding: 20px; background-color: #f9f9f9; border-radius: 5px; border: 1px solid #ccc;">
+                <h3>Filtered Data</h3>
+                <div id="playerDataList">
+                    <!-- ข้อมูลผู้เล่นจะถูกแสดงที่นี่ -->
+                    <p>No data available. Apply a filter to see results.</p>
                 </div>
             </div>
         </div>
+        
     </div>
 
     <!-- Popup สำหรับเข้าสู่ระบบ -->
@@ -357,8 +374,119 @@
             const year = document.getElementById('yearDropdown').value;
             const url = `/api/player-data/${year}`;
          }
+
+         document.getElementById('yearDropdown').addEventListener('change', loadPlayerData);
+
+         async function loadPlayerData() {
+    const year = document.getElementById('yearDropdown').value;
+    try {
+        const response = await fetch(`/api/player-data/${year}`);
+        const data = await response.json();
+        
+        displayPlayerData(data);
+        selectColumns(data);
+    } catch (error) {
+        console.error('Error fetching player data:', error);
+    }
+}
+
+function applyFilter() {
+    // เลือก checkbox ทั้งหมดที่มีชื่อเป็น 'columns'
+    const checkboxes = document.querySelectorAll('input[name="columns"]');
+
+    // สร้าง array สำหรับเก็บชื่อคอลัมน์ที่ถูกเลือก
+    const selectedColumns = [];
+
+    // ตรวจสอบสถานะของแต่ละ checkbox
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            selectedColumns.push(checkbox.value); // ถ้าติ๊ก checkbox จะเพิ่มค่าของมันไปยัง array
+        }
+    });
+
+    // สร้าง filterData object สำหรับส่งข้อมูล
+    const filterData = {
+        columns: selectedColumns, // รวมชื่อคอลัมน์ที่ถูกเลือก
+        searchInput: document.getElementById('searchInput').value, // ข้อความค้นหา
+        position: document.getElementById('positionFilter').value, // ตำแหน่ง
+        year: document.getElementById('yearDropdownplayerinfo').value // ปีที่เลือก
+    };
+
+    // ส่งข้อมูลไปยังเซิร์ฟเวอร์ด้วย fetch API
+    fetch('/filter', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(filterData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        // แสดงข้อมูลที่ได้จากเซิร์ฟเวอร์ (data) ที่แสดงผล
+        displayFilteredData(data); // เรียกใช้ฟังก์ชันเพื่อแสดงข้อมูลที่ได้บนหน้าเว็บ
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+
+
+
+
+// ฟังก์ชันแสดงข้อมูลใน data-display-box
+function displayFilteredData(data) {
+    const playerDataList = document.getElementById('playerDataList');
+    playerDataList.innerHTML = ''; // เคลียร์ข้อมูลเก่าก่อนแสดงข้อมูลใหม่
+
+    // สร้างตารางเพื่อแสดงข้อมูล
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+    
+    // สร้างส่วนหัวของตาราง
+    const headerRow = document.createElement('tr');
+    const headers = ['sofifa_id', 'short_name', 'long_name', 'club_position', 'overall', 'value_eur', 'wage_eur', 'club_name', 'age', 'nationality_name'];
+
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        th.style.border = '1px solid #ccc';
+        th.style.padding = '8px';
+        th.style.textAlign = 'left';
+        headerRow.appendChild(th);
+    });
+
+    table.appendChild(headerRow);
+
+    if (data.length === 0) {
+        playerDataList.innerHTML = '<p>No data available. Apply a filter to see results.</p>';
+    } else {
+        data.forEach(player => {
+            const row = document.createElement('tr');
+
+            headers.forEach(header => {
+                const td = document.createElement('td');
+                td.textContent = player[header] || 'N/A'; // แสดงข้อมูลหรือ 'N/A' หากไม่มีข้อมูล
+                td.style.border = '1px solid #ccc';
+                td.style.padding = '8px';
+                row.appendChild(td);
+            });
+
+            table.appendChild(row);
+        });
+
+        playerDataList.appendChild(table); // เพิ่มตารางไปยัง playerDataList
+    }
+}
+
+// เรียก loadPlayerData ครั้งแรกเมื่อเปิดหน้า playerinfo
+document.addEventListener('DOMContentLoaded', loadPlayerData);
+
         
         document.addEventListener('DOMContentLoaded', () => {
+            applyFilter();
             const currentSection = localStorage.getItem('currentSection') || 'dashboard';
             showSection(currentSection);
 
