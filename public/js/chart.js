@@ -20,17 +20,19 @@ async function fetchDataByYear() {
 
 async function fetchDataChart() {
   const year = document.getElementById('yearSelect').value
+  console.log(year)
   try {
       const response = await fetch(`/get-chart/${year}`);
       if (!response.ok) {
           throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log(data," bar.js");
+
       createBarChart(data.barData);
       createPieChart(data.pieData);
       createDoughnutChart(data.doughnutData);
       createLineChart(data.lineData);
+
   } catch (error) {
       console.error('Error fetching data:', error);
   }
@@ -39,6 +41,14 @@ async function fetchDataChart() {
 function createBarChart(data) {
   const ctx = document.getElementById('barChart');
 
+  if (!Array.isArray(data) || data.length === 0) {
+    console.error('Invalid or empty data for chart');
+    return;
+  }
+
+  const labels = data.map(item => item.nationality_name); // ดึงชื่อประเทศ
+  const counts = data.map(item => parseInt(item.player_count, 10)); // ดึงจำนวนผู้เล่นในแต่ละประเทศ
+
   if (Chart.getChart("barChart")) {
     Chart.getChart("barChart").destroy();
   }
@@ -46,10 +56,10 @@ function createBarChart(data) {
   new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: labels,
       datasets: [{
         label: 'จำนวน',
-        data: [12, 19, 3, 5, 2, 3],
+        data: counts,
         borderWidth: 1
       }]
     },
@@ -65,11 +75,13 @@ function createBarChart(data) {
 
 function createPieChart(data) {
   const ctx = document.getElementById('pieChart').getContext('2d');
-    // ดึงชื่อประเทศและจำนวนผู้เล่น
-    // const labels = data.map(item => item.nationality_name);
-    // const counts = data.map(item => item.count);
+    if (!Array.isArray(data) || data.length === 0) {
+      console.error('Invalid or empty data for chart');
+      return;
+    }
 
-    // สร้างกราฟ Chart.js ด้วยข้อมูลที่ดึงมา
+    const labels = data.map(item => item.club_name); // ดึงชื่อประเทศ
+    const counts = data.map(item => parseInt(item.player_count, 10)); // ดึงจำนวนผู้เล่นในแต่ละประเทศ
 
     if (Chart.getChart("pieChart")) {
       Chart.getChart("pieChart").destroy();
@@ -77,18 +89,16 @@ function createPieChart(data) {
     new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: [
-          'Red',
-          'Blue',
-          'Yellow'
-        ],
+        labels: labels,
         datasets: [{
-          label: [],
-          data: [300, 50, 100],
+          label: "",
+          data: counts,
           backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 205, 86)'
+            'rgb(0, 82, 204)',
+            'rgb(0, 102, 255)',
+            'rgb(51, 133, 255)',
+            'rgb(102, 163, 255)',
+            'rgb(153, 194, 255)'
           ],
           hoverOffset: 4
         }]
@@ -111,6 +121,13 @@ function createPieChart(data) {
 
 function createDoughnutChart(data) {
   const ctx = document.getElementById('doughnutChart');
+  if (!Array.isArray(data) || data.length === 0) {
+    console.error('Invalid or empty data for chart');
+    return;
+  }
+
+  const labels = data.map(item => item.club_position); // ดึงชื่อประเทศ
+  const counts = data.map(item => parseInt(item.counts, 10)); // ดึงจำนวนผู้เล่นในแต่ละประเทศ
 
   if (Chart.getChart("doughnutChart")) {
     Chart.getChart("doughnutChart").destroy();
@@ -119,14 +136,10 @@ function createDoughnutChart(data) {
   new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: [
-        'Red',
-        'Blue',
-        'Yellow'
-      ],
+      labels: labels,
       datasets: [{
         label: 'My First Dataset',
-        data: [300, 50, 100],
+        data: counts,
         backgroundColor: [
           'rgb(255, 99, 132)',
           'rgb(54, 162, 235)',
@@ -143,6 +156,13 @@ function createDoughnutChart(data) {
 
 function createLineChart(data) {
   const ctx = document.getElementById('lineChart');
+  if (!Array.isArray(data) || data.length === 0) {
+    console.error('Invalid or empty data for chart');
+    return;
+  }
+
+  const labels = data.map(item => item.overall); // ดึงชื่อประเทศ
+  const counts = data.map(item => parseInt(item.average_wage_eur, 10)); // ดึงจำนวนผู้เล่นในแต่ละประเทศ
 
   if (Chart.getChart("lineChart")) {
     Chart.getChart("lineChart").destroy();
@@ -151,13 +171,13 @@ function createLineChart(data) {
   new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ["a","b","c","d","e","f","g"],
+      labels: labels,
       datasets: [{
-        label: 'My First Dataset',
-        data: [65, 59, 80, 81, 56, 55, 40],
+        label: 'เงินรายสัปดาห์',
+        data: counts,
         fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
+        borderColor: 'rgb(255, 26, 26)',
+        tension: 0
       }]
     },
     options: {

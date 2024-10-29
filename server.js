@@ -103,7 +103,6 @@ app.get('/dashboard/data/:year', async (req, res) => {
         // สร้างผลลัพธ์รวม
         const responseData = dataPrevious ? [dataCurrent, dataPrevious] : [dataCurrent, dataCurrent];
 
-        console.log(responseData);
         res.json(responseData); // ส่งข้อมูลกลับ
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -121,19 +120,36 @@ app.get('/get-chart/:year', async (req, res) => {
         let doughnutData;
 
         try {
-            const sqlPie = `SELECT nationality_name AS count FROM ${year}`;
+            const sqlPie = `SELECT club_name, COUNT(*) AS player_count
+                                FROM ${year}
+                                WHERE club_name IS NOT NULL
+                                GROUP BY club_name
+                                ORDER BY player_count DESC
+                                LIMIT 5;`;
             let result = await pool.query(sqlPie);
             pieData = result.rows || [];
 
-            const sqlLine = `SELECT COUNT(*) AS count FROM ${year}`;
+            const sqlLine = `SELECT ROUND(AVG(wage_eur)::NUMERIC, 2) AS average_wage_eur, overall
+                            FROM ${year}
+                            GROUP BY overall
+                            ORDER BY overall DESC LIMIT 100`;
             result = await pool.query(sqlLine);
             lineData = result.rows || [];
 
-            const sqlBar = `SELECT COUNT(nation_position) AS count FROM ${year}`;
+            const sqlBar = `SELECT nationality_name, COUNT(*) AS player_count
+                                FROM ${year}
+                                GROUP BY nationality_name
+                                ORDER BY player_count DESC
+                                LIMIT 5; `;
             result = await pool.query(sqlBar);
             barData = result.rows || [];
 
-            const sqlDoughnut = `SELECT COUNT(DISTINCT league_name) AS count FROM ${year}`;
+            const sqlDoughnut = `SELECT club_position, COUNT(club_position) AS counts
+                            FROM ${year}
+                            WHERE club_position IS NOT NULL
+                            GROUP BY club_position
+                            ORDER BY counts DESC
+                            LIMIT 10;`;
             result = await pool.query(sqlDoughnut);
             doughnutData = result.rows || [];
 
@@ -149,7 +165,6 @@ app.get('/get-chart/:year', async (req, res) => {
             doughnutData: doughnutData || [] 
         };
 
-        console.log(responseData);
         res.json(responseData); // ส่งข้อมูลกลับ
     } catch (error) {
         console.error('Error fetching data:', error);
