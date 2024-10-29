@@ -78,13 +78,13 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
         const dashboardData = {
             totalPlayers: totalPlayersResult.rows[0]?.totalplayers || 'N/A',
             avgMaxOverallAge: avgMaxOverallAgeResult.rows[0]?.avgmaxoverallage || 'N/A',
-            currentYearComparison: `${currentYearComparisonResult.currentYear} / ${currentYearComparisonResult.previousYear}`,
+            currentYearComparison: currentYearComparisonResult.currentYear / currentYearComparisonResult.previousYear,
             teamsCount: teamsCountResult.rows[0]?.teamscount || 'N/A',
             playerEachLevel: playerEachLevelResult.rows.map(row => 
                 `${row.league_level || 'No level'}: ${row.playercount || 0}`
             ).join(', ')
         };
-
+        console.log(dashboardData);
         res.json(dashboardData);
     } catch (err) {
         console.error(err);
@@ -171,9 +171,7 @@ app.get('/dashboard/data/:year', async (req, res) => {
         res.status(500).send([]); 
     }
 });
-//khao
 
-//khao
 app.get('/get-chart/:year', async (req, res) => {
     const year = req.params.year;
     try {
@@ -234,7 +232,6 @@ app.get('/get-chart/:year', async (req, res) => {
         res.status(500).render('index', { data: [] });
     }
 });
-//khao
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
 app.post('/login', async (req, res) => {
