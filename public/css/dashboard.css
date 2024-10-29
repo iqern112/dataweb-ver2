@@ -25,3 +25,53 @@ body {
     flex: 1;
     margin: 0 10px;
 }
+
+.stat-box{
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-bottom: 10px;
+}
+
+        /* กำหนด layout ของ container */
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 คอลัมน์ที่มีขนาดเท่ากัน */
+    grid-template-rows: 1fr 1fr;    /* 2 แถวที่มีขนาดเท่ากัน */
+    gap: 10px; /* ระยะห่างระหว่างกริด */
+    height: 100vh; /* กำหนดความสูงเต็มหน้าจอ */
+}
+
+/* สไตล์ของแต่ละกริด */
+.grid-item {
+    background-color: #4CAF50;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+*{
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+body{
+	font-family: sans-serif;
+	min-height: 100vh;
+	color: #555;
+	background-color: #fff;
+}
+.chart{
+	max-width: 900px;
+	height: 450px;
+	padding: 50px;
+	margin: 0 auto;
+}
+.chart .chart_types{
+	text-align: center;
+	margin-bottom: 30px;
+}
+.chart .chart_types button{
+	padding: 10px 25px;
+}

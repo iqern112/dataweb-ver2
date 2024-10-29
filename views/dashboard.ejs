@@ -10,14 +10,6 @@
 </head>
 
 <body>
-    <style>
-        .stat-box{
-            box-sizing: border-box;
-            padding-left: 10px;
-            padding-right: 10px;
-            margin-bottom: 10px;
-        }
-    </style>
     <div>
         <div class="layer2">
             <select id="yearSelect" onchange="fetchDataByYear()">
@@ -34,21 +26,37 @@
         <div class="stats">
             <div class="stat-box">
                 <h2>Total Player</h2>
-                <div id="totalDisplay"></div> <!-- Element สำหรับแสดงผลลัพธ์ -->
+                <div id="totalDisplay"> 0</div> <!-- Element สำหรับแสดงผลลัพธ์ -->
             </div>
 
             <div class="stat-box">
                 <h2>Total Player</h2>
-                <div id="growthrateDisplay"></div> <!-- Element สำหรับแสดงผลลัพธ์ -->
+                <div id="growthrateDisplay"> 0</div> <!-- Element สำหรับแสดงผลลัพธ์ -->
             </div>
 
             <div class="stat-box">
                 <h2>Total Player</h2>
-                <div class="countDisplay"></div> <!-- Element สำหรับแสดงผลลัพธ์ -->
+                <div class="countDisplay"> 0</div> <!-- Element สำหรับแสดงผลลัพธ์ -->
+            </div>
+        </div>
+        <div>
+            <canvas id="myChart"></canvas>
+        </div>
+        <div class="container chart">
+            
+            <div class="grid-item">Grid 2
+
+            </div>
+            <div class="grid-item">Grid 3
+
+            </div>
+            <div class="grid-item">Grid 4
+
             </div>
         </div>
 
     </div>
+
     <script>
         async function fetchDataByYear() {
             const year = document.getElementById('yearSelect').value
@@ -88,7 +96,8 @@
             }
         }
     </script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/public/js/bar.js"></script>
 </body>
 
 </html>
