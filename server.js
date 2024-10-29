@@ -138,8 +138,6 @@ app.get('/api/player-data/:year', async (req, res) => {
 });
 
 
-
-
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
     const data = await querydata(); // คิวรีข้อมูล nationality

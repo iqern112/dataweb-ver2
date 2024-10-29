@@ -234,7 +234,7 @@
                     <input type="checkbox" id="checkbox_sofifa_id" name="columns" value="sofifa_id" checked> sofifa_id<br>
                     <input type="checkbox" id="checkbox_short_name" name="columns" value="short_name" checked> short_name<br>
                     <input type="checkbox" id="checkbox_long_name" name="columns" value="long_name" checked> long_name<br>
-                    <input type="checkbox" id="checkbox_club_position" name="columns" value="player_positions" checked> player_positions<br>
+                    <input type="checkbox" id="checkbox_player_positions" name="columns" value="player_positions" checked> player_positions<br>
                     <input type="checkbox" id="checkbox_overall" name="columns" value="overall" checked> overall<br>
                     <input type="checkbox" id="checkbox_value_eur" name="columns" value="value_eur" checked> value_eur<br>
                     <input type="checkbox" id="checkbox_wage_eur" name="columns" value="wage_eur" checked> wage_eur<br>
@@ -266,7 +266,6 @@
         
             <!-- กล่องแสดงผลข้อมูล -->
             <div id="data-display-box" style="flex: 2; padding: 20px; background-color: #f9f9f9; border-radius: 5px; border: 1px solid #ccc;">
-                <h3>Filtered Data</h3>
                 <div id="playerDataList">
                     <!-- ข้อมูลผู้เล่นจะถูกแสดงที่นี่ -->
                     <p>No data available. Apply a filter to see results.</p>
@@ -391,52 +390,43 @@
 }
 
 function applyFilter() {
-    // เลือก checkbox ทั้งหมดที่มีชื่อเป็น 'columns'
     const checkboxes = document.querySelectorAll('input[name="columns"]');
-
-    // สร้าง array สำหรับเก็บชื่อคอลัมน์ที่ถูกเลือก
     const selectedColumns = [];
-
-    // ตรวจสอบสถานะของแต่ละ checkbox
     checkboxes.forEach(checkbox => {
         if (checkbox.checked) {
-            selectedColumns.push(checkbox.value); // ถ้าติ๊ก checkbox จะเพิ่มค่าของมันไปยัง array
+            selectedColumns.push(checkbox.value);
         }
     });
 
-    // สร้าง filterData object สำหรับส่งข้อมูล
-    const filterData = {
-        columns: selectedColumns, // รวมชื่อคอลัมน์ที่ถูกเลือก
-        searchInput: document.getElementById('searchInput').value, // ข้อความค้นหา
-        position: document.getElementById('positionFilter').value, // ตำแหน่ง
-        year: document.getElementById('yearDropdownplayerinfo').value // ปีที่เลือก
-    };
+    const searchInput = document.getElementById('searchInput').value;
+    const position = document.getElementById('positionFilter').value;
+    const year = document.getElementById('yearDropdownplayerinfo').value;
 
-    // ส่งข้อมูลไปยังเซิร์ฟเวอร์ด้วย fetch API
-    fetch('/filter', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(filterData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        // แสดงข้อมูลที่ได้จากเซิร์ฟเวอร์ (data) ที่แสดงผล
-        displayFilteredData(data); // เรียกใช้ฟังก์ชันเพื่อแสดงข้อมูลที่ได้บนหน้าเว็บ
-        console.log(data);
-    })
-    .catch(error => {
-        console.error('Error:', error);
+    // เก็บค่าการตั้งค่าฟิลเตอร์ลงใน localStorage
+    localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+    localStorage.setItem('searchInput', searchInput);
+    localStorage.setItem('position', position);
+    localStorage.setItem('year', year);
+
+    const queryParams = new URLSearchParams({
+        columns: selectedColumns.join(','),
+        searchInput,
+        position,
     });
+
+    fetch(`/api/player-data/${year}?${queryParams}`)
+        .then(response => response.json())
+        .then(data => {
+            displayFilteredData(data, selectedColumns);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
 }
 
 
-
-
-
 // ฟังก์ชันแสดงข้อมูลใน data-display-box
-function displayFilteredData(data) {
+function displayFilteredData(data, selectedColumns) {
     const playerDataList = document.getElementById('playerDataList');
     playerDataList.innerHTML = ''; // เคลียร์ข้อมูลเก่าก่อนแสดงข้อมูลใหม่
 
@@ -445,11 +435,9 @@ function displayFilteredData(data) {
     table.style.width = '100%';
     table.style.borderCollapse = 'collapse';
     
-    // สร้างส่วนหัวของตาราง
+    // สร้างส่วนหัวของตารางตาม selectedColumns
     const headerRow = document.createElement('tr');
-    const headers = ['sofifa_id', 'short_name', 'long_name', 'club_position', 'overall', 'value_eur', 'wage_eur', 'club_name', 'age', 'nationality_name'];
-
-    headers.forEach(header => {
+    selectedColumns.forEach(header => {
         const th = document.createElement('th');
         th.textContent = header;
         th.style.border = '1px solid #ccc';
@@ -460,13 +448,15 @@ function displayFilteredData(data) {
 
     table.appendChild(headerRow);
 
+    // ตรวจสอบว่ามีข้อมูลหรือไม่
     if (data.length === 0) {
         playerDataList.innerHTML = '<p>No data available. Apply a filter to see results.</p>';
     } else {
         data.forEach(player => {
             const row = document.createElement('tr');
 
-            headers.forEach(header => {
+            // เพิ่มเซลล์ข้อมูลเฉพาะคอลัมน์ที่เลือก
+            selectedColumns.forEach(header => {
                 const td = document.createElement('td');
                 td.textContent = player[header] || 'N/A'; // แสดงข้อมูลหรือ 'N/A' หากไม่มีข้อมูล
                 td.style.border = '1px solid #ccc';
@@ -481,8 +471,34 @@ function displayFilteredData(data) {
     }
 }
 
+
 // เรียก loadPlayerData ครั้งแรกเมื่อเปิดหน้า playerinfo
 document.addEventListener('DOMContentLoaded', loadPlayerData);
+
+function loadFilterSettings() {
+    // โหลดค่าการตั้งค่าฟิลเตอร์จาก localStorage
+    const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || [];
+    const searchInput = localStorage.getItem('searchInput') || '';
+    const position = localStorage.getItem('position') || '';
+    const year = localStorage.getItem('year') || '2022'; // กำหนดค่าเริ่มต้นปีเป็น 2022
+
+    // ตั้งค่า checkbox ตาม selectedColumns ที่โหลดมา
+    const checkboxes = document.querySelectorAll('input[name="columns"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = selectedColumns.includes(checkbox.value);
+    });
+
+    // ตั้งค่า input และ dropdown อื่น ๆ ตามค่าที่โหลดมา
+    document.getElementById('searchInput').value = searchInput;
+    document.getElementById('positionFilter').value = position;
+    document.getElementById('yearDropdownplayerinfo').value = year;
+
+    // เรียกใช้ applyFilter เพื่อแสดงผลตามการตั้งค่าที่บันทึกไว้
+    applyFilter();
+}
+
+// เรียกใช้ loadFilterSettings เมื่อตอนโหลดหน้า
+window.onload = loadFilterSettings;
 
         
         document.addEventListener('DOMContentLoaded', () => {
