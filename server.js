@@ -12,6 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use(express.static('public'));
 
 // การเชื่อมต่อฐานข้อมูล PostgreSQL
+//khao
 const pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
@@ -19,9 +20,11 @@ const pool = new Pool({
     port: process.env.DB_PORT,
     database: process.env.DB_NAME,
 });
+//khao
 
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูลตาม table ที่ส่งมา
+//khao
 async function queryDatabase(yearTable, columns) {
     if (!yearTable) {
         console.error('yearTable is undefined');
@@ -39,13 +42,17 @@ async function queryDatabase(yearTable, columns) {
         return null;
     }
 }
+//khao
 
 // Route แสดงข้อมูลหน้าแรก
+//khao
 app.get('/', async (req, res) => {
     const data = await queryDatabase();
     res.render('index', { data });
 });
+//khao
 
+//khao
 app.get('/data/:year', async (req, res) => {
     const year = req.params.year;
     const sql = `SELECT * FROM "${year}" LIMIT 10`; // แก้ไขเป็นตารางตามปี
@@ -58,7 +65,9 @@ app.get('/data/:year', async (req, res) => {
         res.status(500).render('index', { data: [] }); // ส่ง array ว่างในกรณีที่เกิดข้อผิดพลาด
     }
 });
+//khao
 
+//khao
 app.get('/dashboard', async (req, res) => {
     try {
         // เริ่มต้นด้วยปี 2022
@@ -73,7 +82,9 @@ app.get('/dashboard', async (req, res) => {
         res.status(500).render('dashboard', { data: [], year: 'fifa22' });
     }
 });
+//khao
 
+//khao
 app.get('/dashboard/data/:year', async (req, res) => {
     const year = req.params.year;
 
@@ -109,8 +120,9 @@ app.get('/dashboard/data/:year', async (req, res) => {
         res.status(500).send([]); 
     }
 });
+//khao
 
-//ดึงข้อมูลให้ chart
+//khao
 app.get('/get-chart/:year', async (req, res) => {
     const year = req.params.year;
     try {
@@ -171,7 +183,7 @@ app.get('/get-chart/:year', async (req, res) => {
         res.status(500).render('index', { data: [] });
     }
 });
-
+//khao
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
 app.post('/login', async (req, res) => {
