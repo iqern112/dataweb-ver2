@@ -181,19 +181,13 @@
             
             <!-- Drill Down Menu -->
             <div id="drillDownMenu" class="drill-down-menu" onmouseover="showDrillDown()" onmouseout="hideDrillDown()">
-                <a href="#option1" onclick="showMangePopup()">Mange</a>
+                <a href="/manage" target="__blank" onclick="showMangePopup();">Mange</a>
             </div>
         </div>
     </div>
 
-    <!-- Popup สำหรับ Manage -->
-    <div id="showMange" class="popup" onmousedown="startDragging(event)" onmouseup="stopDragging()">
-        <h3>เข้าสู่ระบบ Manage</h3>
-        <button onclick="closeMangePopup()" class="close-btn">&times;</button>
-        <input type="text" placeholder="Username">
-        <input type="password" placeholder="Password">
-        <button onclick="">Submit</button>
-    </div>
+
+
 
     <!-- Navbar -->
     <div class="navbar">

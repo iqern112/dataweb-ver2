@@ -9,7 +9,7 @@ app.use(express.json());
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
-// app.use(express.static('public'));
+app.use(express.urlencoded({extended:false}));
 
 // การเชื่อมต่อฐานข้อมูล PostgreSQL
 //khao
@@ -129,9 +129,7 @@ app.get('/', async (req, res) => {
     const data = await queryDatabase(); // คิวรีข้อมูล nationality
     res.render('index', { data }); // ส่งข้อมูลไปยังหน้า index
 });
-//khao
 
-//khao
 app.get('/dashboard/data/:year', async (req, res) => {
     const year = req.params.year;
 
