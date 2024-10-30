@@ -148,6 +148,7 @@
             display: flex;
             gap: 10px;
             padding: 20px;
+            margin-bottom: 10px;
             background-color: #f9f9f9;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -206,12 +207,15 @@
         <div id="blockinformation">
             <div id="totalPlayers" class="info-box">Total Player</div>
             <div id="avgMaxOverallAge" class="info-box">Avg Max Overall/Age</div>
-            <div id="currentYearComparison" class="info-box">Current Year / Previous</div>
+            <div id="currentYearComparison" class="info-box">จากปีที่แล้ว
+                <div id="compareIndicator" class="">จากปีที่แล้ว</div>
+            </div>
             <div id="teamsCount" class="info-box">Teams</div>
             <div id="playerEachLevel" class="info-box wide-box">Player Each Level</div>
         </div>
 
-
+        <!-- Dashboard -->
+        <%- include('dashboard') %>
     </div>
 
 
@@ -307,244 +311,241 @@
         <button onclick="login()">Submit</button>
     </div>
 
-    <!-- Dashboard -->
-    <%- include('dashboard') %>
-
-        <script src="/js/chart.js"></script>
-        <script>
-
-            window.onload = function() {
-                fetchDataByYear();
-                fetchDataChart(); // เรียกใช้ทันทีที่หน้าโหลด js sorting
-            };
-
-            function showLoginPopup() {
-                document.getElementById('loginPopup').style.display = 'block';
-            }
-
-            function closePopup() {
-                document.getElementById("loginPopup").style.display = "none";
-                document.getElementById("username").value = "";
-                document.getElementById("password").value = "";
-            }
-
-            function logout() {
-                document.getElementById("statusBtn").innerText = "Guest";
-                document.getElementById("loginBtn").innerText = "Login";
-                document.getElementById("loginBtn").onclick = showLoginPopup;
-                document.getElementById("username").value = "";
-                document.getElementById("password").value = "";
-            }
-
-            async function login() {
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
-                });
-
-                const result = await response.json();
-                if (result.success) {
-                    document.getElementById("statusBtn").innerText = "Admin";
-                    document.getElementById("loginBtn").innerText = "Logout";
-                    document.getElementById("loginBtn").onclick = logout;
-                } else {
-                    alert("เข้าสู่ระบบไม่สำเร็จ");
-                    document.getElementById("username").value = "";
-                    document.getElementById("password").value = "";
-                }
-                document.getElementById('loginPopup').style.display = 'none';
-            }
-
-            function showSection(sectionId) {
-                // ซ่อนทุก sections
-                const sections = document.querySelectorAll('.content-section');
-                sections.forEach(section => section.style.display = 'none');
-
-                // แสดงเฉพาะ section ที่เลือก
-                const selectedSection = document.getElementById(sectionId);
-                if (selectedSection) {
-                    selectedSection.style.display = 'block';
-                    localStorage.setItem('currentSection', sectionId); // บันทึก section ปัจจุบันใน localStorage
-
-                    // เรียกข้อมูล Dashboard เมื่อแสดง Dashboard
-                    if (sectionId === 'dashboard') {
-                        getDashboardData(); // เรียกฟังก์ชันที่นี่
-                    }
-                }
-
-                // อัพเดต navbar ให้แสดงลิงก์ที่เลือกเป็น active
-                document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
-                document.getElementById(sectionId + 'Link').classList.add('active');
-
-            }
-
-            function getDashboardData() {
-                const year = document.getElementById('yearDropdown').value;
-                const url = `/api/dashboard-data/${year}`;
-
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('totalPlayers').innerText = `Total Players: ${data.totalPlayers}`;
-                        document.getElementById('avgMaxOverallAge').innerText = `Avg Max Overall Age: ${data.avgMaxOverallAge}`;
-                        document.getElementById('currentYearComparison').innerText = `Current Year / Previous Year: ${data.currentYearComparison}`;
-                        document.getElementById('teamsCount').innerText = `Teams Count: ${data.teamsCount}`;
-                        document.getElementById('playerEachLevel').innerText = `Player Count by League Level: ${data.playerEachLevel}`;
-                    })
-                    .catch(error => console.error('Error fetching dashboard data:', error));
-            }
-
-            function getPlayerinformation() {
-                const year = document.getElementById('yearDropdown').value;
-                const url = `/api/player-data/${year}`;
-            }
-
-            document.getElementById('yearDropdown').addEventListener('change', loadPlayerData);
-
-            async function loadPlayerData() {
-                const year = document.getElementById('yearDropdown').value;
-                try {
-                    const response = await fetch(`/api/player-data/${year}`);
-                    const data = await response.json();
-
-                    displayPlayerData(data);
-                    selectColumns(data);
-                } catch (error) {
-                    console.error('Error fetching player data:', error);
-                }
-            }
-
-            function applyFilter() {
-                // เลือก checkbox ทั้งหมดที่มีชื่อเป็น 'columns'
-                const checkboxes = document.querySelectorAll('input[name="columns"]');
-
-                // สร้าง array สำหรับเก็บชื่อคอลัมน์ที่ถูกเลือก
-                const selectedColumns = [];
-
-                // ตรวจสอบสถานะของแต่ละ checkbox
-                checkboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        selectedColumns.push(checkbox.value); // ถ้าติ๊ก checkbox จะเพิ่มค่าของมันไปยัง array
-                    }
-                });
-
-                // สร้าง filterData object สำหรับส่งข้อมูล
-                const filterData = {
-                    columns: selectedColumns, // รวมชื่อคอลัมน์ที่ถูกเลือก
-                    searchInput: document.getElementById('searchInput').value, // ข้อความค้นหา
-                    position: document.getElementById('positionFilter').value, // ตำแหน่ง
-                    year: document.getElementById('yearDropdownplayerinfo').value // ปีที่เลือก
-                };
-
-                // ส่งข้อมูลไปยังเซิร์ฟเวอร์ด้วย fetch API
-                fetch('/filter', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(filterData)
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        // แสดงข้อมูลที่ได้จากเซิร์ฟเวอร์ (data) ที่แสดงผล
-                        displayFilteredData(data); // เรียกใช้ฟังก์ชันเพื่อแสดงข้อมูลที่ได้บนหน้าเว็บ
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                    });
-            }
-
-            // ฟังก์ชันแสดงข้อมูลใน data-display-box
-            function displayFilteredData(data) {
-                const playerDataList = document.getElementById('playerDataList');
-                playerDataList.innerHTML = ''; // เคลียร์ข้อมูลเก่าก่อนแสดงข้อมูลใหม่
-
-                // สร้างตารางเพื่อแสดงข้อมูล
-                const table = document.createElement('table');
-                table.style.width = '100%';
-                table.style.borderCollapse = 'collapse';
-
-                // สร้างส่วนหัวของตาราง
-                const headerRow = document.createElement('tr');
-                const headers = ['sofifa_id', 'short_name', 'long_name', 'club_position', 'overall', 'value_eur', 'wage_eur', 'club_name', 'age', 'nationality_name'];
-
-                headers.forEach(header => {
-                    const th = document.createElement('th');
-                    th.textContent = header;
-                    th.style.border = '1px solid #ccc';
-                    th.style.padding = '8px';
-                    th.style.textAlign = 'left';
-                    headerRow.appendChild(th);
-                });
-
-                table.appendChild(headerRow);
-
-                if (data.length === 0) {
-                    playerDataList.innerHTML = '<p>No data available. Apply a filter to see results.</p>';
-                } else {
-                    data.forEach(player => {
-                        const row = document.createElement('tr');
-
-                        headers.forEach(header => {
-                            const td = document.createElement('td');
-                            td.textContent = player[header] || 'N/A'; // แสดงข้อมูลหรือ 'N/A' หากไม่มีข้อมูล
-                            td.style.border = '1px solid #ccc';
-                            td.style.padding = '8px';
-                            row.appendChild(td);
-                        });
-
-                        table.appendChild(row);
-                    });
-
-                    playerDataList.appendChild(table); // เพิ่มตารางไปยัง playerDataList
-                }
-            }
-
-            // เรียก loadPlayerData ครั้งแรกเมื่อเปิดหน้า playerinfo
-            document.addEventListener('DOMContentLoaded', loadPlayerData);
 
 
-            document.addEventListener('DOMContentLoaded', () => {
-                applyFilter();
-                const currentSection = localStorage.getItem('currentSection') || 'dashboard';
-                showSection(currentSection);
+    <script src="/js/chart.js"></script>
+    <script>
 
-                const yearDropdown = document.getElementById('yearDropdown');
-                const selectedYear = localStorage.getItem('selectedYear') || '2022';
+        function showLoginPopup() {
+            document.getElementById('loginPopup').style.display = 'block';
+        }
 
-                // ตั้งค่า dropdown ตามค่าที่บันทึกใน localStorage
-                yearDropdown.value = selectedYear;
+        function closePopup() {
+            document.getElementById("loginPopup").style.display = "none";
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        }
 
-                // เมื่อปีใน dropdown เปลี่ยน
-                yearDropdown.addEventListener('change', () => {
-                    localStorage.setItem('selectedYear', yearDropdown.value);
-                    getDashboardData(); // เรียกข้อมูลใหม่ตามปีที่เลือก
-                });
+        function logout() {
+            document.getElementById("statusBtn").innerText = "Guest";
+            document.getElementById("loginBtn").innerText = "Login";
+            document.getElementById("loginBtn").onclick = showLoginPopup;
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+        }
 
-                getDashboardData(); // เรียกข้อมูลครั้งแรกหลังจากตั้งค่าปี
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
             });
 
-            async function fetchDataByYear() {
-                const year = document.getElementById('yearSelect').value
-                try {
-                    const response = await fetch(`/dashboard/data/${year}`);
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    const data = await response.json();
-                    updateTotalDisplay(data);
-                    growthrateDisplay(data)
-                } catch (error) {
-                    console.error('Error fetching data:', error);
+            const result = await response.json();
+            if (result.success) {
+                document.getElementById("statusBtn").innerText = "Admin";
+                document.getElementById("loginBtn").innerText = "Logout";
+                document.getElementById("loginBtn").onclick = logout;
+            } else {
+                alert("เข้าสู่ระบบไม่สำเร็จ");
+                document.getElementById("username").value = "";
+                document.getElementById("password").value = "";
+            }
+            document.getElementById('loginPopup').style.display = 'none';
+        }
+
+        function showSection(sectionId) {
+            // ซ่อนทุก sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.style.display = 'none');
+
+            // แสดงเฉพาะ section ที่เลือก
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.style.display = 'block';
+                localStorage.setItem('currentSection', sectionId); // บันทึก section ปัจจุบันใน localStorage
+
+                // เรียกข้อมูล Dashboard เมื่อแสดง Dashboard
+                if (sectionId === 'dashboard') {
+                    getDashboardData(); // เรียกฟังก์ชันที่นี่
                 }
             }
-        </script>
+
+            // อัพเดต navbar ให้แสดงลิงก์ที่เลือกเป็น active
+            document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
+            document.getElementById(sectionId + 'Link').classList.add('active');
+
+        }
+
+        function getDashboardData() {
+            const year = document.getElementById('yearDropdown').value;
+            const url = `/api/dashboard-data/${year}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalPlayers').innerHTML = `จำนวนนักเตะทั้งหมด<br><hr>${data.totalPlayers}`;
+                    document.getElementById('avgMaxOverallAge').innerHTML = `Avg Max Overall Age<br><hr>${data.avgMaxOverallAge}`;
+
+                    const currentYearComparison = parseInt(data.currentYearComparison, 10);
+                    const yeareCompare = document.getElementById('currentYearComparison')
+                    if (currentYearComparison > 0) {
+                        yeareCompare.innerHTML = `มีนักเตะเพิ่มขึ้น<br><hr>${currentYearComparison}`;
+                        yeareCompare.classList.add("green", "arrow-up");
+                        yeareCompare.classList.remove("red", "arrow-down");
+                    } else if (currentYearComparison < 0) {
+                        yeareCompare.innerHTML = `มีนักเตะลดลง<br><hr>${currentYearComparison}`;
+                        yeareCompare.classList.add("red", "arrow-down");
+                        yeareCompare.classList.remove("green", "arrow-up");
+                    } else {
+                        yeareCompare.classList.remove("indicator", "green", "red","arrow-up","arrow-down");
+                        yeareCompare.innerHTML = `มีนักเตะเท่าเดิม<hr>0`;
+                    }
+                    yeareCompare.innerHTML += `<br><br><br><br><br>จากปีที่แล้ว`
+                    
+                    document.getElementById('teamsCount').innerHTML = `จำนวนทีมสโมสร <br><hr>${data.teamsCount}`;
+                    const playerEachLevelArray = data.playerEachLevel.split(',').map(item => item.trim());
+                    const formattedPlayerEachLevel = playerEachLevelArray.join('<br>');
+                    document.getElementById('playerEachLevel').innerHTML = `จำนวนนักเตะต่ออันดับลีค<br><hr>${formattedPlayerEachLevel}`;
+                }).catch(error => console.error('Error fetching dashboard data:', error));
+        }
+
+        function getPlayerinformation() {
+            const year = document.getElementById('yearDropdown').value;
+            const url = `/api/player-data/${year}`;
+        }
+
+        document.getElementById('yearDropdown').addEventListener('change', loadPlayerData);
+
+        async function loadPlayerData() {
+            const year = document.getElementById('yearDropdown').value;
+            try {
+                const response = await fetch(`/api/player-data/${year}`);
+                const data = await response.json();
+
+                displayPlayerData(data);
+                selectColumns(data);
+            } catch (error) {
+                console.error('Error fetching player data:', error);
+            }
+        }
+
+        function applyFilter() {
+            // เลือก checkbox ทั้งหมดที่มีชื่อเป็น 'columns'
+            const checkboxes = document.querySelectorAll('input[name="columns"]');
+
+            // สร้าง array สำหรับเก็บชื่อคอลัมน์ที่ถูกเลือก
+            const selectedColumns = [];
+
+            // ตรวจสอบสถานะของแต่ละ checkbox
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedColumns.push(checkbox.value); // ถ้าติ๊ก checkbox จะเพิ่มค่าของมันไปยัง array
+                }
+            });
+
+            // สร้าง filterData object สำหรับส่งข้อมูล
+            const filterData = {
+                columns: selectedColumns, // รวมชื่อคอลัมน์ที่ถูกเลือก
+                searchInput: document.getElementById('searchInput').value, // ข้อความค้นหา
+                position: document.getElementById('positionFilter').value, // ตำแหน่ง
+                year: document.getElementById('yearDropdownplayerinfo').value // ปีที่เลือก
+            };
+
+            // ส่งข้อมูลไปยังเซิร์ฟเวอร์ด้วย fetch API
+            fetch('/filter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(filterData)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // แสดงข้อมูลที่ได้จากเซิร์ฟเวอร์ (data) ที่แสดงผล
+                    displayFilteredData(data); // เรียกใช้ฟังก์ชันเพื่อแสดงข้อมูลที่ได้บนหน้าเว็บ
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // ฟังก์ชันแสดงข้อมูลใน data-display-box
+        function displayFilteredData(data) {
+            const playerDataList = document.getElementById('playerDataList');
+            playerDataList.innerHTML = ''; // เคลียร์ข้อมูลเก่าก่อนแสดงข้อมูลใหม่
+
+            // สร้างตารางเพื่อแสดงข้อมูล
+            const table = document.createElement('table');
+            table.style.width = '100%';
+            table.style.borderCollapse = 'collapse';
+
+            // สร้างส่วนหัวของตาราง
+            const headerRow = document.createElement('tr');
+            const headers = ['sofifa_id', 'short_name', 'long_name', 'club_position', 'overall', 'value_eur', 'wage_eur', 'club_name', 'age', 'nationality_name'];
+
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                th.style.border = '1px solid #ccc';
+                th.style.padding = '8px';
+                th.style.textAlign = 'left';
+                headerRow.appendChild(th);
+            });
+
+            table.appendChild(headerRow);
+
+            if (data.length === 0) {
+                playerDataList.innerHTML = '<p>No data available. Apply a filter to see results.</p>';
+            } else {
+                data.forEach(player => {
+                    const row = document.createElement('tr');
+
+                    headers.forEach(header => {
+                        const td = document.createElement('td');
+                        td.textContent = player[header] || 'N/A'; // แสดงข้อมูลหรือ 'N/A' หากไม่มีข้อมูล
+                        td.style.border = '1px solid #ccc';
+                        td.style.padding = '8px';
+                        row.appendChild(td);
+                    });
+
+                    table.appendChild(row);
+                });
+
+                playerDataList.appendChild(table); // เพิ่มตารางไปยัง playerDataList
+            }
+        }
+
+        // เรียก loadPlayerData ครั้งแรกเมื่อเปิดหน้า playerinfo
+        document.addEventListener('DOMContentLoaded', loadPlayerData);
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyFilter();
+            const currentSection = localStorage.getItem('currentSection') || 'dashboard';
+            showSection(currentSection);
+
+            const yearDropdown = document.getElementById('yearDropdown');
+            const selectedYear = localStorage.getItem('selectedYear') || '2022';
+
+            // ตั้งค่า dropdown ตามค่าที่บันทึกใน localStorage
+            yearDropdown.value = selectedYear;
+
+            // เมื่อปีใน dropdown เปลี่ยน
+            yearDropdown.addEventListener('change', () => {
+                localStorage.setItem('selectedYear', yearDropdown.value);
+                getDashboardData(); // เรียกข้อมูลใหม่ตามปีที่เลือก
+            });
+
+            getDashboardData(); // เรียกข้อมูลครั้งแรกหลังจากตั้งค่าปี
+        });
+
+    </script>
 </body>
 
 </html>
