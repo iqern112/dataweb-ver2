@@ -211,7 +211,7 @@ app.get('/get-chart/:year', async (req, res) => {
 
             const sqlDoughnut = `SELECT club_position, COUNT(club_position) AS counts
                             FROM ${year}
-                            WHERE club_position IS NOT NULL
+                            WHERE club_position IS NOT NULL AND club_position NOT IN ('SUB','RES')
                             GROUP BY club_position
                             ORDER BY counts DESC
                             LIMIT 10;`;
