@@ -240,7 +240,6 @@ app.get('/get-chart/:year', async (req, res) => {
             radarData: radarData || [],
             line2Data : line2Data || []
         };
-        console.log(radarData)
         res.json(responseData);
     } catch (error) {
         console.error('Error fetching data:', error);

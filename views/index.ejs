@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="stylesheet" href="/css/drilldown.css">
     <title>FIFA(P)INFO</title>
     <style>
         body {
@@ -176,9 +176,23 @@
     <div class="header">
         <div class="logo">FIFA(P)INFO</div>
         <div class="nav-buttons">
-            <button id="statusBtn">Guest</button>
+            <button id="statusBtn" onmouseover="showDrillDown()" onmouseout="hideDrillDown()">Guest</button>
             <button id="loginBtn" onclick="showLoginPopup()">Login</button>
+            
+            <!-- Drill Down Menu -->
+            <div id="drillDownMenu" class="drill-down-menu" onmouseover="showDrillDown()" onmouseout="hideDrillDown()">
+                <a href="#option1" onclick="showMangePopup()">Mange</a>
+            </div>
         </div>
+    </div>
+
+    <!-- Popup สำหรับ Manage -->
+    <div id="showMange" class="popup" onmousedown="startDragging(event)" onmouseup="stopDragging()">
+        <h3>เข้าสู่ระบบ Manage</h3>
+        <button onclick="closeMangePopup()" class="close-btn">&times;</button>
+        <input type="text" placeholder="Username">
+        <input type="password" placeholder="Password">
+        <button onclick="">Submit</button>
     </div>
 
     <!-- Navbar -->
@@ -186,7 +200,6 @@
         <a href="#dashboard" onclick="showSection('dashboard')" id="dashboardLink">Dashboard</a>
         <a href="#playerinfo" onclick="showSection('playerinfo')" id="playerinfoLink">Player Information</a>
     </div>
-
 
     <!-- หน้าต่าง Dashboard -->
     <div id="dashboard" class="content-section" style="display: none;">
@@ -546,6 +559,7 @@
         });
 
     </script>
+    <script src="/js/drilldown.js"></script>
 </body>
 
 </html>

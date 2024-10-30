@@ -1,0 +1,28 @@
+.nav-buttons {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.drill-down-menu {
+    display: none; /* ซ่อนเมนูในตอนแรก */
+    position: absolute;
+    top: 100%; /* ปรากฏอยู่ใต้ปุ่ม */
+    right: 0;
+    background-color: #f9f9f9;
+    min-width: 150px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.drill-down-menu a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.drill-down-menu a:hover {
+    background-color: #ddd;
+}
