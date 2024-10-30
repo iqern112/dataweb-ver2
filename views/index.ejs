@@ -174,6 +174,7 @@
     <div class="header">
         <div class="logo">FIFA(P)INFO</div>
         <div class="nav-buttons">
+            <button id="edit" onclick="showedit()">Edit</button>
             <button id="statusBtn">Guest</button>
             <button id="loginBtn" onclick="showLoginPopup()">Login</button>
         </div>
@@ -228,8 +229,7 @@
                      
                 </select>
             </div>
-        <!-- Container สำหรับแบ่งกล่อง Filter และ Data -->
-        <!-- Container สำหรับแบ่งกล่อง Filter และ Data -->
+       
 <div id="filter-data-container" style="display: flex; gap: 20px; margin-top: 20px;">
     <!-- กล่องด้านซ้ายที่รวม selectColumnsbox และ searchbox -->
     <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
@@ -356,6 +356,7 @@
             <!-- ข้อมูลผู้เล่นจะถูกแสดงที่นี่ -->
             <p>No data available. Apply a filter to see results.</p>
         </div>
+        </div>
     </div>
 </div>
 
@@ -369,9 +370,106 @@
         <button onclick="login()">Submit</button>
     </div>
 
+    <div id="showedit" class="popup">
+        <h3>ลบ/เพิ่ม Admin</h3>
+        <button onclick="closeEdit()" class="close-btn">&times;</button>
+        
+        <table id="adminTable">
+            <tr>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Actions</th>
+            </tr>
+            <!-- แถวข้อมูลของผู้ใช้จะถูกเพิ่มในส่วนนี้ด้วย JavaScript -->
+        </table>
+    
+        <!-- ฟอร์มเพิ่ม Admin -->
+        <h4>เพิ่ม Admin</h4>
+        <input type="text" id="newUsername" placeholder="Username">
+        <input type="password" id="newPassword" placeholder="Password">
+        <button onclick="addNewAdmin()">เพิ่ม Admin</button>
+    </div>
+    
+    
+    
     <script>
+
+function showedit(){
+    document.getElementById('showedit').style.display = 'block';
+
+    fetch('/get-admins')
+        .then(response => response.json())
+        .then(data => {
+            const adminTable = document.getElementById('adminTable');
+
+            // ล้างข้อมูลเก่า
+            adminTable.innerHTML = `
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Actions</th>
+                </tr>`;
+
+            // เพิ่มข้อมูลผู้ใช้ที่เป็น admin
+            data.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.password}</td>
+                    <td>
+                        <button onclick="removeAdmin('${user.username}', '${user.password}')">ลบ</button>
+                    </td>
+                `;
+                adminTable.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching admin data:', error));
+}
+
+function addNewAdmin() {
+    const username = document.getElementById('newUsername').value;
+    const password = document.getElementById('newPassword').value;
+
+    fetch('/add-admin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        document.getElementById('newUsername').value = ''; // ล้างค่าในช่องกรอก
+        document.getElementById('newPassword').value = ''; // ล้างค่าในช่องกรอก
+        showedit(); // รีเฟรชข้อมูล admin ใหม่หลังจากเพิ่ม
+    })
+    .catch(error => console.error('Error adding new admin:', error));
+}
+
+function removeAdmin(username, password) {
+    fetch('/delete-admin', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message);
+        showedit(); // รีเฟรชข้อมูล admin ใหม่หลังจากลบ
+    })
+    .catch(error => console.error('Error deleting admin:', error));
+}
+
+function closeEdit(){
+    document.getElementById("showedit").style.display = "none";
+}
+
+
         function showLoginPopup() {
-            console.log('test04')
+            console.log('showLoginPopup')
             document.getElementById('loginPopup').style.display = 'block';
         }
 

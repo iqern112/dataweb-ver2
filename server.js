@@ -128,6 +128,54 @@ app.get('/', async (req, res) => {
     res.render('index', { data }); // ส่งข้อมูลไปยังหน้า index
 });
 
+// Route สำหรับดึงข้อมูล admin
+app.get('/get-admins', async (req, res) => {
+    try {
+        const result = await pool.query("SELECT username, password FROM users ");
+        res.json(result.rows);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error retrieving admin data");
+    }
+});
+
+// Route สำหรับเพิ่ม admin
+app.post('/add-admin', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        await pool.query("INSERT INTO users (username, password) VALUES ($1, $2)", [username, password]);
+        res.json({ message: "Admin added successfully" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error adding admin");
+    }
+});
+
+// Route สำหรับลบ admin โดยใช้ username และ password
+app.delete('/delete-admin', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const result = await pool.query(
+            "DELETE FROM users WHERE username = $1 AND password = $2 ",
+            [username, password]
+        );
+
+        if (result.rowCount > 0) {
+            res.json({ message: "Admin deleted successfully" });
+        } else {
+            res.status(404).json({ message: "Admin not found or credentials do not match" });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error deleting admin");
+    }
+});
+
+
+
+
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
