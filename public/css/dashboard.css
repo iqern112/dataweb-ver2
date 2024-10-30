@@ -30,9 +30,10 @@ body {
 .container.chart-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr); /* 2 คอลัมน์ขนาดเท่ากัน */
-    grid-template-rows: repeat(2, 1fr);    /* 2 แถวขนาดเท่ากัน */
+    grid-template-rows: repeat(3, 1fr);    /* 2 แถวขนาดเท่ากัน */
     gap: 10px; /* ช่องว่างระหว่าง grid */
-    height: 500px; /* ความสูงคงที่ของ container */
+    height: 900px; /* ความสูงคงที่ของ container */
+    margin-bottom: 10px;
 }
 
 /* สไตล์ของแต่ละกริด */
@@ -55,3 +56,24 @@ canvas {
     max-width: 100%; /* ขนาดสูงสุดที่ต้องการ */
     max-height: 100%;
 }
+
+.indicator {
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+}
+.green {
+    color: green;
+}
+.red {
+    color: red;
+}
+  .arrow-up::before {
+    content: "↑";
+    margin-right: 5px;
+  }
+  .arrow-down::before {
+    content: "↓";
+    margin-right: 5px;
+  }

@@ -28,10 +28,7 @@ async function queryDatabase(yearTable, columns) {
         console.error('yearTable is undefined');
         return null;
     }
-
-    const selectedColumns = columns && columns.length > 0 ? columns.join(', ') : '*';
     const year = yearTable
-
     try {
         const result = await pool.query(`SELECT * FROM "${year}" LIMIT 10`);
         return result.rows;
@@ -49,7 +46,7 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
 
     const queries = {
         totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
-        avgMaxOverallAge: `SELECT AVG(overall) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
+        avgMaxOverallAge: `SELECT ROUND(AVG(wage_eur)::NUMERIC, 2) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
         currentYearComparison: async () => {
             const currentYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft}')`);
             const previousYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft - 1}')`);
@@ -65,7 +62,8 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
             return { currentYear, previousYear };
         },
         teamsCount: `SELECT COUNT(DISTINCT club_name) AS teamsCount FROM ${tableName}`,
-        playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level`
+        playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level
+                            ORDER BY playerCount DESC`
     };
     
     try {
@@ -78,13 +76,12 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
         const dashboardData = {
             totalPlayers: totalPlayersResult.rows[0]?.totalplayers || 'N/A',
             avgMaxOverallAge: avgMaxOverallAgeResult.rows[0]?.avgmaxoverallage || 'N/A',
-            currentYearComparison: currentYearComparisonResult.currentYear / currentYearComparisonResult.previousYear,
+            currentYearComparison: `${currentYearComparisonResult.currentYear - currentYearComparisonResult.previousYear}`,
             teamsCount: teamsCountResult.rows[0]?.teamscount || 'N/A',
             playerEachLevel: playerEachLevelResult.rows.map(row => 
                 `${row.league_level || 'No level'}: ${row.playercount || 0}`
             ).join(', ')
         };
-        console.log(dashboardData);
         res.json(dashboardData);
     } catch (err) {
         console.error(err);
@@ -137,35 +134,29 @@ app.get('/', async (req, res) => {
 //khao
 app.get('/dashboard/data/:year', async (req, res) => {
     const year = req.params.year;
-    console.log(year, "/dashboard/data/:year")
 
-    // แยกปีออกมาเพื่อหาปีที่ลดลง
     const currentYear = parseInt(year.replace('fifa', ''), 10);
     const previousYear = `fifa${currentYear - 1}`;
 
-    // สร้าง query ที่รวมข้อมูลจากทั้งสองตาราง
     try {
-        // Query จากปีปัจจุบัน
         const sqlCurrent = `SELECT COUNT(*) AS count FROM ${year}`;
         const resultCurrent = await pool.query(sqlCurrent);
-        const dataCurrent = resultCurrent.rows[0] || { count: 0 }; // ค่าจาก query ปีปัจจุบัน
+        const dataCurrent = resultCurrent.rows[0] || { count: 0 };
 
         let dataPrevious;
 
         try {
-            // Query สำหรับปีที่ลดลง
             const sqlPrevious = `SELECT COUNT(*) AS count FROM ${previousYear}`;
             const resultPrevious = await pool.query(sqlPrevious);
             dataPrevious = resultPrevious.rows[0] || { count: 0 };
         } catch (error) {
             console.warn(`Table ${previousYear} does not exist. Using data from ${year} only.`);
-            dataPrevious = null; // กรณีไม่มีตารางของปีที่ลดลง
+            dataPrevious = null;
         }
 
-        // สร้างผลลัพธ์รวม
         const responseData = dataPrevious ? [dataCurrent, dataPrevious] : [dataCurrent, dataCurrent];
 
-        res.json(responseData); // ส่งข้อมูลกลับ
+        res.json(responseData);
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).send([]); 
@@ -179,14 +170,16 @@ app.get('/get-chart/:year', async (req, res) => {
         let lineData;
         let barData;
         let doughnutData;
+        let radarData;
+        let line2Data;
 
         try {
-            const sqlPie = `SELECT club_name, COUNT(*) AS player_count
+            const sqlPie = `SELECT preferred_foot, COUNT(*) AS player_count
                                 FROM ${year}
-                                WHERE club_name IS NOT NULL
-                                GROUP BY club_name
+                                WHERE age IS NOT NULL
+                                GROUP BY preferred_foot
                                 ORDER BY player_count DESC
-                                LIMIT 5;`;
+                                `;
             let result = await pool.query(sqlPie);
             pieData = result.rows || [];
 
@@ -214,19 +207,41 @@ app.get('/get-chart/:year', async (req, res) => {
             result = await pool.query(sqlDoughnut);
             doughnutData = result.rows || [];
 
+            const sqlRadar = `SELECT preferred_foot,
+                            ROUND(AVG(pace)::NUMERIC,2) AS avgpace,
+                            ROUND(AVG(shooting)::NUMERIC,2) AS avgshoot,
+                            ROUND(AVG(dribbling)::NUMERIC,2) AS avgdrib,
+                            ROUND(AVG(physic)::NUMERIC,2) AS avgphysic,
+                            ROUND(AVG(passing)::NUMERIC,2) AS avgpassing
+                            FROM ${year}
+                            GROUP BY preferred_foot`;
+            result = await pool.query(sqlRadar);
+            radarData = result.rows || [];
+
+            const sqlLine2 = `SELECT league_name, ROUND(AVG(height_cm)::NUMERIC,1) AS avgheight
+                                , ROUND(AVG(weight_kg)::NUMERIC,1) AS avgweight
+                                FROM ${year}
+                                WHERE league_name IN ('French Ligue 1','English Premier League',
+                                'Italian Serie A','German 1. Bundesliga','Spain Primera Division')
+                                GROUP BY league_name`;
+            result = await pool.query(sqlLine2);
+            line2Data = result.rows || [];
+
         } catch (error) {
             console.error('Error fetching data in /get-char:', error);
-            dataPrevious = null; // กรณีไม่มีตารางของปีที่ลดลง
+            dataPrevious = null;
         }
 
         const responseData = { 
             pieData: pieData || [], 
             lineData: lineData || [], 
             barData: barData || [], 
-            doughnutData: doughnutData || [] 
+            doughnutData: doughnutData || [],
+            radarData: radarData || [],
+            line2Data : line2Data || []
         };
-
-        res.json(responseData); // ส่งข้อมูลกลับ
+        console.log(radarData)
+        res.json(responseData);
     } catch (error) {
         console.error('Error fetching data:', error);
         res.status(500).render('index', { data: [] });
