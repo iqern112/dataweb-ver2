@@ -21,8 +21,6 @@ const pool = new Pool({
         ssl: {
             rejectUnauthorized: false
         }
-
-        
 });
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูล nationality
