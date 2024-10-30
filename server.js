@@ -79,7 +79,8 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
 // Endpoint to get player data based on year for initial display
 app.get('/api/player-data/:year', async (req, res) => {
     const year = req.params.year;
-    const tableName = `${year}`;
+    const tableName = `fifa${year}`;
+    console.log(tableName)
 
     const columns = req.query.columns ? req.query.columns.split(',') : ['*'];
     const searchInput = req.query.searchInput || '';
