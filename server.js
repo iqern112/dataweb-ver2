@@ -28,7 +28,6 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     const year = req.params.year;
     const fft = year.slice(-2);
     const tableName = `fifa${fft}`;
-    console.log(year);
 
     const queries = {
         totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
@@ -68,7 +67,6 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
             ).join(', ')
         };
 
-        console.log(dashboardData); // แสดงข้อมูลบน Terminal
         res.json(dashboardData);
     } catch (err) {
         console.error(err);
@@ -80,24 +78,20 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
 // Endpoint to get player data based on year for initial display
 app.get('/api/player-data/:year', async (req, res) => {
     const year = req.params.year;
-    const fft = year.slice(-2);
-    const tableName = `fifa${fft}`;
+    const tableName = `fifa${year}`;
+    console.log(`selectcolums/${year}`);
 
     const columns = req.query.columns ? req.query.columns.split(',') : ['*'];
     const searchInput = req.query.searchInput || '';
     const position = req.query.position || '';
+    const page = parseInt(req.query.page) || 1; // รับค่าหน้าปัจจุบัน
+    const limit = 20; // จำนวนข้อมูลที่จะแสดงต่อหน้า
+    const offset = (page - 1) * limit; // คำนวณ offset
 
     let query = `SELECT ${columns.join(', ')} FROM ${tableName} WHERE 1=1`;
     
-    if (searchInput) {
-        query += ` AND short_name ILIKE '%${searchInput}%'`;
-    }
 
-    if (position) {
-        query += ` AND player_positions = '${position}'`;
-    }
-
-    query += ` LIMIT 20`;
+    query += ` LIMIT ${limit} OFFSET ${offset}`; // เพิ่ม limit และ offset
 
     try {
         const result = await pool.query(query);
@@ -108,10 +102,29 @@ app.get('/api/player-data/:year', async (req, res) => {
     }
 });
 
+app.get("/api/searchPlayer", (req, res) => {
+    const { query, year, columns } = req.query;
+    const columnList = columns.split(",").join(", ");
+    const sqlQuery = `
+        SELECT ${columnList} FROM fifa${year}
+        WHERE short_name ILIKE $1 OR long_name ILIKE $1;
+    `;
+    console.log(`search/${year}`);
+
+    pool.query(sqlQuery, [`%${query}%`], (error, results) => {
+        if (error) {
+            console.error("Error querying database:", error);
+            res.status(500).send("Server Error");
+        } else {
+            res.json(results.rows);
+        }
+    });
+});
+
 
 // Route แสดงข้อมูลหน้าแรก
 app.get('/', async (req, res) => {
-    const data = await querydata(); // คิวรีข้อมูล nationality
+    const data = await querydata();
     res.render('index', { data }); // ส่งข้อมูลไปยังหน้า index
 });
 

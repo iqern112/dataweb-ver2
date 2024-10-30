@@ -215,65 +215,143 @@
 
             <div id="yearselect">
                 <h2>Player Information</h2>
-                <select id="yearDropdownplayerinfo">
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
+                <select id="yearDropdownplayerinfo" onchange="SelectColumns()">
+                    <option value="22">2022</option>
+                    <option value="21">2021</option>
                     <!-- เพิ่มปีอื่น ๆ ตามที่ต้องการ -->
-                    
                 </select>
             </div>
         <!-- Container สำหรับแบ่งกล่อง Filter และ Data -->
-        <div id="filter-data-container" style="display: flex; gap: 20px; margin-top: 20px;">
-
-            <!-- กล่อง Filter -->
-            <div id="filter-box" style="flex: 1; padding: 20px; background-color: #e0e0e0; border-radius: 5px;">
-        
-                <!-- ตัวเลือกคอลัมน์ข้อมูล -->
-                <h3>Select Columns to Display</h3>
+        <!-- Container สำหรับแบ่งกล่อง Filter และ Data -->
+<div id="filter-data-container" style="display: flex; gap: 20px; margin-top: 20px;">
+    <!-- กล่องด้านซ้ายที่รวม selectColumnsbox และ searchbox -->
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 20px;">
+        <!-- กล่อง Filter -->
+        <div id="selectColumnsbox" style="padding: 20px; background-color: #e0e0e0; border-radius: 5px;">
+            <div id="filter-box">
+                <h3>Select Columns</h3>
                 <div id="columnSelection" style="max-height: 200px; overflow-y: scroll; border: 1px solid #ccc; padding: 8px; border-radius: 5px;">
                     <input type="checkbox" id="checkbox_sofifa_id" name="columns" value="sofifa_id" checked> sofifa_id<br>
-                    <input type="checkbox" id="checkbox_short_name" name="columns" value="short_name" checked> short_name<br>
-                    <input type="checkbox" id="checkbox_long_name" name="columns" value="long_name" checked> long_name<br>
-                    <input type="checkbox" id="checkbox_player_positions" name="columns" value="player_positions" checked> player_positions<br>
-                    <input type="checkbox" id="checkbox_overall" name="columns" value="overall" checked> overall<br>
-                    <input type="checkbox" id="checkbox_value_eur" name="columns" value="value_eur" checked> value_eur<br>
-                    <input type="checkbox" id="checkbox_wage_eur" name="columns" value="wage_eur" checked> wage_eur<br>
-                    <input type="checkbox" id="checkbox_club_name" name="columns" value="club_name" checked> club_name<br>
-                    <input type="checkbox" id="checkbox_age" name="columns" value="age" checked> age<br>
-                    <input type="checkbox" id="checkbox_nationality_name" name="columns" value="nationality_name" checked> nationality_name<br>
+                        <input type="checkbox" id="checkbox_short_name" name="columns" value="short_name" checked> short_name<br>
+                        <input type="checkbox" id="checkbox_long_name" name="columns" value="long_name" checked> long_name<br>
+                        <input type="checkbox" id="checkbox_player_positions" name="columns" value="player_positions" checked> player_positions<br>
+                        <input type="checkbox" id="checkbox_overall" name="columns" value="overall" checked> overall<br>
+                        <input type="checkbox" id="checkbox_potential" name="columns" value="potential"> potential<br>
+                        <input type="checkbox" id="checkbox_value_eur" name="columns" value="value_eur" checked> value_eur<br>
+                        <input type="checkbox" id="checkbox_wage_eur" name="columns" value="wage_eur" checked> wage_eur<br>
+                        <input type="checkbox" id="checkbox_age" name="columns" value="age" checked> age<br>
+                        <input type="checkbox" id="checkbox_height_cm" name="columns" value="height_cm"> height_cm<br>
+                        <input type="checkbox" id="checkbox_weight_kg" name="columns" value="weight_kg"> weight_kg<br>
+                        <input type="checkbox" id="checkbox_club_team_id" name="columns" value="club_team_id"> club_team_id<br>
+                        <input type="checkbox" id="checkbox_club_name" name="columns" value="club_name" checked> club_name<br>
+                        <input type="checkbox" id="checkbox_league_name" name="columns" value="league_name"> league_name<br>
+                        <input type="checkbox" id="checkbox_league_level" name="columns" value="league_level"> league_level<br>
+                        <input type="checkbox" id="checkbox_club_position" name="columns" value="club_position"> club_position<br>
+                        <input type="checkbox" id="checkbox_club_jersey_number" name="columns" value="club_jersey_number"> club_jersey_number<br>
+                        <input type="checkbox" id="checkbox_nationality_id" name="columns" value="nationality_id"> nationality_id<br>
+                        <input type="checkbox" id="checkbox_nationality_name" name="columns" value="nationality_name" checked> nationality_name<br>
+                        <input type="checkbox" id="checkbox_nation_position" name="columns" value="nation_position"> nation_position<br>
+                        <input type="checkbox" id="checkbox_nation_jersey_number" name="columns" value="nation_jersey_number"> nation_jersey_number<br>
+                        <input type="checkbox" id="checkbox_preferred_foot" name="columns" value="preferred_foot"> preferred_foot<br>
+                        <input type="checkbox" id="checkbox_weak_foot" name="columns" value="weak_foot"> weak_foot<br>
+                        <input type="checkbox" id="checkbox_skill_moves" name="columns" value="skill_moves"> skill_moves<br>
+                        <input type="checkbox" id="checkbox_international_reputation" name="columns" value="international_reputation"> international_reputation<br>
+                        <input type="checkbox" id="checkbox_work_rate" name="columns" value="work_rate"> work_rate<br>
+                        <input type="checkbox" id="checkbox_release_clause_eur" name="columns" value="release_clause_eur"> release_clause_eur<br>
+                        <input type="checkbox" id="checkbox_player_tags" name="columns" value="player_tags"> player_tags<br>
+                        <input type="checkbox" id="checkbox_player_traits" name="columns" value="player_traits"> player_traits<br>
+                        <input type="checkbox" id="checkbox_pace" name="columns" value="pace"> pace<br>
+                        <input type="checkbox" id="checkbox_shooting" name="columns" value="shooting"> shooting<br>
+                        <input type="checkbox" id="checkbox_passing" name="columns" value="passing"> passing<br>
+                        <input type="checkbox" id="checkbox_dribbling" name="columns" value="dribbling"> dribbling<br>
+                        <input type="checkbox" id="checkbox_defending" name="columns" value="defending"> defending<br>
+                        <input type="checkbox" id="checkbox_physic" name="columns" value="physic"> physic<br>
+                        <input type="checkbox" id="checkbox_attacking_crossing" name="columns" value="attacking_crossing"> attacking_crossing<br>
+                        <input type="checkbox" id="checkbox_attacking_finishing" name="columns" value="attacking_finishing"> attacking_finishing<br>
+                        <input type="checkbox" id="checkbox_attacking_heading_accuracy" name="columns" value="attacking_heading_accuracy"> attacking_heading_accuracy<br>
+                        <input type="checkbox" id="checkbox_attacking_short_passing" name="columns" value="attacking_short_passing"> attacking_short_passing<br>
+                        <input type="checkbox" id="checkbox_attacking_volleys" name="columns" value="attacking_volleys"> attacking_volleys<br>
+                        <input type="checkbox" id="checkbox_skill_dribbling" name="columns" value="skill_dribbling"> skill_dribbling<br>
+                        <input type="checkbox" id="checkbox_skill_curve" name="columns" value="skill_curve"> skill_curve<br>
+                        <input type="checkbox" id="checkbox_skill_fk_accuracy" name="columns" value="skill_fk_accuracy"> skill_fk_accuracy<br>
+                        <input type="checkbox" id="checkbox_skill_long_passing" name="columns" value="skill_long_passing"> skill_long_passing<br>
+                        <input type="checkbox" id="checkbox_skill_ball_control" name="columns" value="skill_ball_control"> skill_ball_control<br>
+                        <input type="checkbox" id="checkbox_movement_acceleration" name="columns" value="movement_acceleration"> movement_acceleration<br>
+                        <input type="checkbox" id="checkbox_movement_sprint_speed" name="columns" value="movement_sprint_speed"> movement_sprint_speed<br>
+                        <input type="checkbox" id="checkbox_movement_agility" name="columns" value="movement_agility"> movement_agility<br>
+                        <input type="checkbox" id="checkbox_movement_reactions" name="columns" value="movement_reactions"> movement_reactions<br>
+                        <input type="checkbox" id="checkbox_movement_balance" name="columns" value="movement_balance"> movement_balance<br>
+                        <input type="checkbox" id="checkbox_power_shot_power" name="columns" value="power_shot_power"> power_shot_power<br>
+                        <input type="checkbox" id="checkbox_power_jumping" name="columns" value="power_jumping"> power_jumping<br>
+                        <input type="checkbox" id="checkbox_power_stamina" name="columns" value="power_stamina"> power_stamina<br>
+                        <input type="checkbox" id="checkbox_power_strength" name="columns" value="power_strength"> power_strength<br>
+                        <input type="checkbox" id="checkbox_power_long_shots" name="columns" value="power_long_shots"> power_long_shots<br>
+                        <input type="checkbox" id="checkbox_mentality_aggression" name="columns" value="mentality_aggression"> mentality_aggression<br>
+                        <input type="checkbox" id="checkbox_mentality_interceptions" name="columns" value="mentality_interceptions"> mentality_interceptions<br>
+                        <input type="checkbox" id="checkbox_mentality_positioning" name="columns" value="mentality_positioning"> mentality_positioning<br>
+                        <input type="checkbox" id="checkbox_mentality_vision" name="columns" value="mentality_vision"> mentality_vision<br>
+                        <input type="checkbox" id="checkbox_mentality_penalties" name="columns" value="mentality_penalties"> mentality_penalties<br>
+                        <input type="checkbox" id="checkbox_mentality_composure" name="columns" value="mentality_composure"> mentality_composure<br>
+                        <input type="checkbox" id="checkbox_defending_marking_awareness" name="columns" value="defending_marking_awareness"> defending_marking_awareness<br>
+                        <input type="checkbox" id="checkbox_defending_standing_tackle" name="columns" value="defending_standing_tackle"> defending_standing_tackle<br>
+                        <input type="checkbox" id="checkbox_defending_sliding_tackle" name="columns" value="defending_sliding_tackle"> defending_sliding_tackle<br>
+                        <input type="checkbox" id="checkbox_goalkeeping_diving" name="columns" value="goalkeeping_diving"> goalkeeping_diving<br>
+                        <input type="checkbox" id="checkbox_goalkeeping_handling" name="columns" value="goalkeeping_handling"> goalkeeping_handling<br>
+                        <input type="checkbox" id="checkbox_goalkeeping_kicking" name="columns" value="goalkeeping_kicking"> goalkeeping_kicking<br>
+                        <input type="checkbox" id="checkbox_goalkeeping_positioning" name="columns" value="goalkeeping_positioning"> goalkeeping_positioning<br>
+                        <input type="checkbox" id="checkbox_goalkeeping_reflexes" name="columns" value="goalkeeping_reflexes"> goalkeeping_reflexes<br>
+                        <input type="checkbox" id="checkbox_goalkeeping_speed" name="columns" value="goalkeeping_speed"> goalkeeping_speed<br>
+                        <input type="checkbox" id="checkbox_ls" name="columns" value="ls"> ls<br>
+                        <input type="checkbox" id="checkbox_st" name="columns" value="st"> st<br>
+                        <input type="checkbox" id="checkbox_rs" name="columns" value="rs"> rs<br>
+                        <input type="checkbox" id="checkbox_lw" name="columns" value="lw"> lw<br>
+                        <input type="checkbox" id="checkbox_lf" name="columns" value="lf"> lf<br>
+                        <input type="checkbox" id="checkbox_cf" name="columns" value="cf"> cf<br>
+                        <input type="checkbox" id="checkbox_rf" name="columns" value="rf"> rf<br>
+                        <input type="checkbox" id="checkbox_rw" name="columns" value="rw"> rw<br>
+                        <input type="checkbox" id="checkbox_lam" name="columns" value="lam"> lam<br>
+                        <input type="checkbox" id="checkbox_cam" name="columns" value="cam"> cam<br>
+                        <input type="checkbox" id="checkbox_ram" name="columns" value="ram"> ram<br>
+                        <input type="checkbox" id="checkbox_lm" name="columns" value="lm"> lm<br>
+                        <input type="checkbox" id="checkbox_lcm" name="columns" value="lcm"> lcm<br>
+                        <input type="checkbox" id="checkbox_cm" name="columns" value="cm"> cm<br>
+                        <input type="checkbox" id="checkbox_rcm" name="columns" value="rcm"> rcm<br>
+                        <input type="checkbox" id="checkbox_rm" name="columns" value="rm"> rm<br>
+                        <input type="checkbox" id="checkbox_lwb" name="columns" value="lwb"> lwb<br>
+                        <input type="checkbox" id="checkbox_ldm" name="columns" value="ldm"> ldm<br>
+                        <input type="checkbox" id="checkbox_cdm" name="columns" value="cdm"> cdm<br>
+                        <input type="checkbox" id="checkbox_rdm" name="columns" value="rdm"> rdm<br>
+                        <input type="checkbox" id="checkbox_rwb" name="columns" value="rwb"> rwb<br>
+                        <input type="checkbox" id="checkbox_lb" name="columns" value="lb"> lb<br>
+                        <input type="checkbox" id="checkbox_lcb" name="columns" value="lcb"> lcb<br>
+                        <input type="checkbox" id="checkbox_cb" name="columns" value="cb"> cb<br>
+                        <input type="checkbox" id="checkbox_rcb" name="columns" value="rcb"> rcb<br>
+                        <input type="checkbox" id="checkbox_rb" name="columns" value="rb"> rb<br>
+                        <input type="checkbox" id="checkbox_gk" name="columns" value="gk"> gk<br>
                 </div>
-
-        
-                <h3>Filter/Search Data</h3>
-        
-                <!-- Input ค้นหาชื่อผู้เล่น -->
-                <input type="text" id="searchInput" placeholder="Search Player Name" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
-        
-                <!-- ตัวเลือกตำแหน่ง -->
-                <label for="positionFilter">Position:</label>
-                <select id="positionFilter" style="width: 100%; padding: 8px; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ccc;">
-                    <option value="">All</option>
-                    <option value="Forward">Forward</option>
-                    <option value="Midfielder">Midfielder</option>
-                    <option value="Defender">Defender</option>
-                    <option value="Goalkeeper">Goalkeeper</option>
-                </select>
-        
-        
-                <!-- ปุ่ม Apply Filter -->
-                <button onclick="applyFilter()" style="margin-top: 10px; padding: 8px 16px; background-color: #333; color: #fff; border: none; cursor: pointer; border-radius: 5px;">Apply Filter</button>
-            </div>
-        
-            <!-- กล่องแสดงผลข้อมูล -->
-            <div id="data-display-box" style="flex: 2; padding: 20px; background-color: #f9f9f9; border-radius: 5px; border: 1px solid #ccc;">
-                <div id="playerDataList">
-                    <!-- ข้อมูลผู้เล่นจะถูกแสดงที่นี่ -->
-                    <p>No data available. Apply a filter to see results.</p>
-                </div>
+                <button onclick="SelectColumns()" style="margin-top: 10px; padding: 8px 16px; background-color: #333; color: #fff; border: none; cursor: pointer; border-radius: 5px;">Apply</button>
             </div>
         </div>
-        
+
+        <!-- กล่องค้นหาผู้เล่น -->
+        <div id="searchbox" style="padding: 20px; background-color: #e0e0e0; border-radius: 5px;">
+            <div id="search-container">
+                <h3>Search Player</h3>
+                <input type="text" id="searchInput" keyup="searchPlayer()" placeholder="Search for players..">
+                <button onclick="searchPlayer()" style="margin-top: 10px; padding: 8px 16px; background-color: #333; color: #fff; border: none; cursor: pointer; border-radius: 5px;">Submit</button>
+            </div>
+        </div>
     </div>
+
+    <!-- กล่องแสดงผลข้อมูลด้านขวา -->
+    <div id="data-display-box" style="flex: 2; padding: 20px; background-color: #f9f9f9; border-radius: 5px; border: 1px solid #ccc;">
+        <div id="playerDataList">
+            <!-- ข้อมูลผู้เล่นจะถูกแสดงที่นี่ -->
+            <p>No data available. Apply a filter to see results.</p>
+        </div>
+    </div>
+</div>
+
 
     <!-- Popup สำหรับเข้าสู่ระบบ -->
     <div id="loginPopup" class="popup">
@@ -330,29 +408,33 @@
         }
 
         function showSection(sectionId) {
-            // ซ่อนทุก sections
-            const sections = document.querySelectorAll('.content-section');
-            sections.forEach(section => section.style.display = 'none');
+    // ซ่อนทุก sections
+    const sections = document.querySelectorAll('.content-section');
+    sections.forEach(section => section.style.display = 'none');
 
-            // แสดงเฉพาะ section ที่เลือก
-            const selectedSection = document.getElementById(sectionId);
-            if (selectedSection) {
-                selectedSection.style.display = 'block';
-                localStorage.setItem('currentSection', sectionId); // บันทึก section ปัจจุบันใน localStorage
+    // แสดงเฉพาะ section ที่เลือก
+    const selectedSection = document.getElementById(sectionId);
+    if (selectedSection) {
+        selectedSection.style.display = 'block';
+        localStorage.setItem('currentSection', sectionId); // บันทึก section ปัจจุบันใน localStorage
 
-                // เรียกข้อมูล Dashboard เมื่อแสดง Dashboard
-                if (sectionId === 'dashboard') {
-                    getDashboardData(); // เรียกฟังก์ชันที่นี่
-                }
-            }
-
-            // อัพเดต navbar ให้แสดงลิงก์ที่เลือกเป็น active
-            document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
-            document.getElementById(sectionId + 'Link').classList.add('active');
-
+        // เรียกข้อมูล Dashboard เมื่อแสดง Dashboard
+        if (sectionId === 'dashboard') {
+            getDashboardData(); // เรียกฟังก์ชันที่นี่
         }
 
-        function getDashboardData() {
+        // เรียกใช้ applyFilter เมื่อแสดง Player Information
+        if (sectionId === 'playerinfo') {
+            SelectColumns();
+        }
+    }
+
+    // อัพเดต navbar ให้แสดงลิงก์ที่เลือกเป็น active
+    document.querySelectorAll('.navbar a').forEach(link => link.classList.remove('active'));
+    document.getElementById(sectionId + 'Link').classList.add('active');
+}
+
+function getDashboardData() {
             const year = document.getElementById('yearDropdown').value;
             const url = `/api/dashboard-data/${year}`;
             console.log(year);
@@ -367,16 +449,77 @@
                     document.getElementById('playerEachLevel').innerText = `Player Count by League Level: ${data.playerEachLevel}`;
                 })
                 .catch(error => console.error('Error fetching dashboard data:', error));
-        }
+}
 
-         function getPlayerinformation(){
-            const year = document.getElementById('yearDropdown').value;
-            const url = `/api/player-data/${year}`;
-         }
+function searchPlayer() {
+    const searchQuery = document.getElementById("searchInput").value;
+    const year = document.getElementById("yearDropdownplayerinfo").value;
+    const selectedColumns = Array.from(document.querySelectorAll("#columnSelection input:checked")).map(checkbox => checkbox.value);
 
-         document.getElementById('yearDropdown').addEventListener('change', loadPlayerData);
+    fetch(`/api/searchPlayer?query=${searchQuery}&year=${year}&columns=${selectedColumns.join(",")}`)
+        .then(response => response.json())
+        .then(data => {
+            displaySearch(data, selectedColumns);
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+        });
+}
 
-         async function loadPlayerData() {
+document.getElementById("searchInput").addEventListener("keyup", function (event) {
+    if (event.key === "Enter") {
+        searchPlayer();
+    }
+});
+
+function displaySearch(data, selectedColumns) {
+    const playerDataList = document.getElementById("playerDataList");
+    playerDataList.innerHTML = ''; // ล้างข้อมูลเก่า
+
+    if (data.length === 0) {
+        playerDataList.innerHTML = '<p>No data available. Apply a filter to see results.</p>';
+        return;
+    }
+
+    // สร้างตารางเพื่อแสดงข้อมูล
+    const table = document.createElement('table');
+    table.style.width = '100%';
+    table.style.borderCollapse = 'collapse';
+
+    // ส่วนหัวของตารางตาม selectedColumns
+    const headerRow = document.createElement('tr');
+    selectedColumns.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        th.style.border = '1px solid #ccc';
+        th.style.padding = '8px';
+        th.style.textAlign = 'left';
+        headerRow.appendChild(th);
+    });
+    table.appendChild(headerRow);
+
+    // แสดงข้อมูลในแต่ละแถว
+    data.forEach(player => {
+        const row = document.createElement('tr');
+        selectedColumns.forEach(column => {
+            const td = document.createElement('td');
+            td.textContent = player[column] || 'N/A'; // แสดงข้อมูลหรือ 'N/A' หากไม่มีข้อมูล
+            td.style.border = '1px solid #ccc';
+            td.style.padding = '8px';
+            row.appendChild(td);
+        });
+        table.appendChild(row);
+    });
+
+    playerDataList.appendChild(table); // เพิ่มตารางไปยัง playerDataList
+}
+
+
+let currentPage = 1;
+
+document.getElementById('yearDropdown').addEventListener('change', loadPlayerData);
+
+async function loadPlayerData() {
     const year = document.getElementById('yearDropdown').value;
     try {
         const response = await fetch(`/api/player-data/${year}`);
@@ -389,29 +532,25 @@
     }
 }
 
-function applyFilter() {
+function SelectColumns() {
     const checkboxes = document.querySelectorAll('input[name="columns"]');
     const selectedColumns = [];
+    
     checkboxes.forEach(checkbox => {
         if (checkbox.checked) {
             selectedColumns.push(checkbox.value);
         }
     });
 
-    const searchInput = document.getElementById('searchInput').value;
-    const position = document.getElementById('positionFilter').value;
+    // Save selected columns to localStorage
+    localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+
     const year = document.getElementById('yearDropdownplayerinfo').value;
 
-    // เก็บค่าการตั้งค่าฟิลเตอร์ลงใน localStorage
-    localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
-    localStorage.setItem('searchInput', searchInput);
-    localStorage.setItem('position', position);
-    localStorage.setItem('year', year);
-
+    // Make API request and display data
     const queryParams = new URLSearchParams({
         columns: selectedColumns.join(','),
-        searchInput,
-        position,
+        page: currentPage // ส่งหมายเลขหน้าปัจจุบัน
     });
 
     fetch(`/api/player-data/${year}?${queryParams}`)
@@ -424,85 +563,111 @@ function applyFilter() {
         });
 }
 
+// ฟังก์ชันสำหรับไปยังหน้าใหม่
+function goToNextPage() {
+    currentPage++;
+    SelectColumns(); // เรียกฟังก์ชัน SelectColumns เพื่อนำข้อมูลหน้าใหม่
+}
 
-// ฟังก์ชันแสดงข้อมูลใน data-display-box
+function goToPreviousPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        SelectColumns(); // เรียกฟังก์ชัน SelectColumns เพื่อนำข้อมูลหน้าใหม่
+    }
+}
+
 function displayFilteredData(data, selectedColumns) {
     const playerDataList = document.getElementById('playerDataList');
-    playerDataList.innerHTML = ''; // เคลียร์ข้อมูลเก่าก่อนแสดงข้อมูลใหม่
+    playerDataList.innerHTML = ''; // เคลียร์ข้อมูลเก่า
 
     // สร้างตารางเพื่อแสดงข้อมูล
     const table = document.createElement('table');
     table.style.width = '100%';
     table.style.borderCollapse = 'collapse';
-    
-    // สร้างส่วนหัวของตารางตาม selectedColumns
+
+    // สร้างส่วนหัวของตารางพร้อมปุ่มเรียงลำดับ
     const headerRow = document.createElement('tr');
     selectedColumns.forEach(header => {
         const th = document.createElement('th');
-        th.textContent = header;
         th.style.border = '1px solid #ccc';
         th.style.padding = '8px';
         th.style.textAlign = 'left';
+        th.innerHTML = `${header} 
+            <button onclick="sortTable('${header}', 'asc')">&#x25B2;</button>
+            <button onclick="sortTable('${header}', 'desc')">&#x25BC;</button>`;
         headerRow.appendChild(th);
     });
-
     table.appendChild(headerRow);
 
-    // ตรวจสอบว่ามีข้อมูลหรือไม่
-    if (data.length === 0) {
-        playerDataList.innerHTML = '<p>No data available. Apply a filter to see results.</p>';
-    } else {
-        data.forEach(player => {
-            const row = document.createElement('tr');
-
-            // เพิ่มเซลล์ข้อมูลเฉพาะคอลัมน์ที่เลือก
-            selectedColumns.forEach(header => {
-                const td = document.createElement('td');
-                td.textContent = player[header] || 'N/A'; // แสดงข้อมูลหรือ 'N/A' หากไม่มีข้อมูล
-                td.style.border = '1px solid #ccc';
-                td.style.padding = '8px';
-                row.appendChild(td);
-            });
-
-            table.appendChild(row);
+    // สร้างส่วนของแถวข้อมูลในตาราง
+    const tbody = document.createElement('tbody');
+    data.forEach(player => {
+        const row = document.createElement('tr');
+        selectedColumns.forEach(header => {
+            const td = document.createElement('td');
+            td.textContent = player[header] || 'N/A';
+            td.setAttribute('data-column', header); // เพิ่ม data-column
+            td.style.border = '1px solid #ccc';
+            td.style.padding = '8px';
+            row.appendChild(td);
         });
+        tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+    playerDataList.appendChild(table);
 
-        playerDataList.appendChild(table); // เพิ่มตารางไปยัง playerDataList
-    }
+    // เพิ่ม pagination แยกจาก table
+    createPagination(playerDataList);
 }
+
+function createPagination(playerDataList) {
+    const paginationDiv = document.createElement('div');
+    paginationDiv.style.marginTop = '10px';
+
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Next';
+    nextButton.onclick = goToNextPage;
+    nextButton.style.marginRight = '10px';
+
+    const prevButton = document.createElement('button');
+    prevButton.textContent = 'Previous';
+    prevButton.onclick = goToPreviousPage;
+    prevButton.style.display = currentPage === 1 ? 'none' : 'inline';
+
+    paginationDiv.appendChild(prevButton);
+    paginationDiv.appendChild(nextButton);
+
+    playerDataList.appendChild(paginationDiv);
+}
+
+function sortTable(columnName, order) {
+    const playerDataList = document.getElementById('playerDataList');
+    const tbody = playerDataList.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    rows.sort((a, b) => {
+        const cellA = a.querySelector(`td[data-column="${columnName}"]`).innerText.toLowerCase();
+        const cellB = b.querySelector(`td[data-column="${columnName}"]`).innerText.toLowerCase();
+
+        if (order === 'asc') {
+            return cellA > cellB ? 1 : -1;
+        } else {
+            return cellA < cellB ? 1 : -1;
+        }
+    });
+
+    // ล้าง tbody และเพิ่มแถวที่จัดเรียงแล้ว
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
 
 
 // เรียก loadPlayerData ครั้งแรกเมื่อเปิดหน้า playerinfo
-document.addEventListener('DOMContentLoaded', loadPlayerData);
+// document.addEventListener('DOMContentLoaded', loadPlayerData);
 
-function loadFilterSettings() {
-    // โหลดค่าการตั้งค่าฟิลเตอร์จาก localStorage
-    const selectedColumns = JSON.parse(localStorage.getItem('selectedColumns')) || [];
-    const searchInput = localStorage.getItem('searchInput') || '';
-    const position = localStorage.getItem('position') || '';
-    const year = localStorage.getItem('year') || '2022'; // กำหนดค่าเริ่มต้นปีเป็น 2022
-
-    // ตั้งค่า checkbox ตาม selectedColumns ที่โหลดมา
-    const checkboxes = document.querySelectorAll('input[name="columns"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = selectedColumns.includes(checkbox.value);
-    });
-
-    // ตั้งค่า input และ dropdown อื่น ๆ ตามค่าที่โหลดมา
-    document.getElementById('searchInput').value = searchInput;
-    document.getElementById('positionFilter').value = position;
-    document.getElementById('yearDropdownplayerinfo').value = year;
-
-    // เรียกใช้ applyFilter เพื่อแสดงผลตามการตั้งค่าที่บันทึกไว้
-    applyFilter();
-}
-
-// เรียกใช้ loadFilterSettings เมื่อตอนโหลดหน้า
-window.onload = loadFilterSettings;
-
-        
         document.addEventListener('DOMContentLoaded', () => {
-            applyFilter();
+            // SelectColumns();
             const currentSection = localStorage.getItem('currentSection') || 'dashboard';
             showSection(currentSection);
 
