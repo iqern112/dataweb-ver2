@@ -50,7 +50,7 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
         },
         teamsCount: `SELECT COUNT(DISTINCT club_name) AS teamsCount FROM ${tableName}`,
         playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level
-                            ORDER BY playerCount DESC`
+                            ORDER BY league_level ASC`
     };
     
     try {
@@ -79,8 +79,7 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
 // Endpoint to get player data based on year for initial display
 app.get('/api/player-data/:year', async (req, res) => {
     const year = req.params.year;
-    const tableName = `fifa${year}`;
-    console.log(`selectcolums/${year}`);
+    const tableName = `${year}`;
 
     const columns = req.query.columns ? req.query.columns.split(',') : ['*'];
     const searchInput = req.query.searchInput || '';
