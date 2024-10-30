@@ -8,6 +8,8 @@ app.use(express.json());
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({extended:false}));
 
 // การเชื่อมต่อฐานข้อมูล PostgreSQL
 const pool = new Pool({
@@ -173,8 +175,89 @@ app.delete('/delete-admin', async (req, res) => {
     }
 });
 
+app.get('/get-chart/:year', async (req, res) => {
+    const year = req.params.year;
+    try {
+        let pieData;
+        let lineData;
+        let barData;
+        let doughnutData;
+        let radarData;
+        let line2Data;
 
+        try {
+            const sqlPie = `SELECT preferred_foot, COUNT(*) AS player_count
+                                FROM ${year}
+                                WHERE age IS NOT NULL
+                                GROUP BY preferred_foot
+                                ORDER BY player_count DESC
+                                `;
+            let result = await pool.query(sqlPie);
+            pieData = result.rows || [];
 
+            const sqlLine = `SELECT ROUND(AVG(wage_eur)::NUMERIC, 2) AS average_wage_eur, overall
+                            FROM ${year}
+                            GROUP BY overall
+                            ORDER BY overall DESC LIMIT 100`;
+            result = await pool.query(sqlLine);
+            lineData = result.rows || [];
+
+            const sqlBar = `SELECT nationality_name, COUNT(*) AS player_count
+                                FROM ${year}
+                                GROUP BY nationality_name
+                                ORDER BY player_count DESC
+                                LIMIT 5; `;
+            result = await pool.query(sqlBar);
+            barData = result.rows || [];
+
+            const sqlDoughnut = `SELECT club_position, COUNT(club_position) AS counts
+                            FROM ${year}
+                            WHERE club_position IS NOT NULL
+                            GROUP BY club_position
+                            ORDER BY counts DESC
+                            LIMIT 10;`;
+            result = await pool.query(sqlDoughnut);
+            doughnutData = result.rows || [];
+
+            const sqlRadar = `SELECT preferred_foot,
+                            ROUND(AVG(pace)::NUMERIC,2) AS avgpace,
+                            ROUND(AVG(shooting)::NUMERIC,2) AS avgshoot,
+                            ROUND(AVG(dribbling)::NUMERIC,2) AS avgdrib,
+                            ROUND(AVG(physic)::NUMERIC,2) AS avgphysic,
+                            ROUND(AVG(passing)::NUMERIC,2) AS avgpassing
+                            FROM ${year}
+                            GROUP BY preferred_foot`;
+            result = await pool.query(sqlRadar);
+            radarData = result.rows || [];
+
+            const sqlLine2 = `SELECT league_name, ROUND(AVG(height_cm)::NUMERIC,1) AS avgheight
+                                , ROUND(AVG(weight_kg)::NUMERIC,1) AS avgweight
+                                FROM ${year}
+                                WHERE league_name IN ('French Ligue 1','English Premier League',
+                                'Italian Serie A','German 1. Bundesliga','Spain Primera Division')
+                                GROUP BY league_name`;
+            result = await pool.query(sqlLine2);
+            line2Data = result.rows || [];
+
+        } catch (error) {
+            console.error('Error fetching data in /get-char:', error);
+            dataPrevious = null;
+        }
+
+        const responseData = { 
+            pieData: pieData || [], 
+            lineData: lineData || [], 
+            barData: barData || [], 
+            doughnutData: doughnutData || [],
+            radarData: radarData || [],
+            line2Data : line2Data || []
+        };
+        res.json(responseData);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).render('index', { data: [] });
+    }
+});
 
 // Route ตรวจสอบข้อมูลการเข้าสู่ระบบ
 app.post('/login', async (req, res) => {

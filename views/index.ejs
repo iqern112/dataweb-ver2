@@ -193,27 +193,28 @@
         <div id="yearselect">
             <h2>Dashboard</h2>
             <select id="yearDropdown">
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-                <option value="2020">2020</option>
-                <option value="2019">2019</option>
-                <option value="2018">2018</option>
-                <option value="2017">2017</option>
-                <option value="2016">2016</option>
-                <option value="2015">2015</option>
-                <!-- เพิ่มปีอื่น ๆ ตามที่ต้องการ -->
-                
+                <option value="fifa22">2022</option>
+                <option value="fifa21">2021</option>
+                <option value="fifa20">2020</option>
+                <option value="fifa19">2019</option>
+                <option value="fifa18">2018</option>
+                <option value="fifa17">2017</option>
+                <option value="fifa16">2016</option>
+                <option value="fifa15">2015</option>
             </select>
         </div>
         <div id="blockinformation">
             <div id="totalPlayers" class="info-box">Total Player</div>
             <div id="avgMaxOverallAge" class="info-box">Avg Max Overall/Age</div>
-            <div id="currentYearComparison" class="info-box">Current Year / Previous</div>
+            <div id="currentYearComparison" class="info-box">จากปีที่แล้ว
+                <div id="compareIndicator" class="">จากปีที่แล้ว</div>
+            </div>
             <div id="teamsCount" class="info-box">Teams</div>
             <div id="playerEachLevel" class="info-box wide-box">Player Each Level</div>
         </div>
         
-        
+            <!-- Dashboard -->
+            <%- include('dashboard') %>
     </div>
 
 
@@ -225,8 +226,12 @@
                 <select id="yearDropdownplayerinfo" onchange="SelectColumns()">
                     <option value="22">2022</option>
                     <option value="21">2021</option>
-                    <!-- เพิ่มปีอื่น ๆ ตามที่ต้องการ -->
-                     
+                    <option value="20">2020</option>
+                    <option value="19">2019</option>
+                    <option value="18">2018</option>
+                    <option value="17">2017</option>
+                    <option value="16">2016</option>
+                    <option value="15">2015</option> 
                 </select>
             </div>
        
@@ -547,11 +552,29 @@ function getDashboardData() {
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    document.getElementById('totalPlayers').innerText = `Total Players: ${data.totalPlayers}`;
-                    document.getElementById('avgMaxOverallAge').innerText = `Avg Max Overall Age: ${data.avgMaxOverallAge}`;
-                    document.getElementById('currentYearComparison').innerText = `Current Year / Previous Year: ${data.currentYearComparison}`;
-                    document.getElementById('teamsCount').innerText = `Teams Count: ${data.teamsCount}`;
-                    document.getElementById('playerEachLevel').innerText = `Player Count by League Level: ${data.playerEachLevel}`;
+                    document.getElementById('totalPlayers').innerHTML = `จำนวนนักเตะทั้งหมด<br><hr>${data.totalPlayers}`;
+                    document.getElementById('avgMaxOverallAge').innerHTML = `Avg Max Overall Age<br><hr>${data.avgMaxOverallAge}`;
+
+                    const currentYearComparison = parseInt(data.currentYearComparison, 10);
+                    const yeareCompare = document.getElementById('currentYearComparison')
+                    if (currentYearComparison > 0) {
+                        yeareCompare.innerHTML = `มีนักเตะเพิ่มขึ้น<br><hr>${currentYearComparison}`;
+                        yeareCompare.classList.add("green", "arrow-up");
+                        yeareCompare.classList.remove("red", "arrow-down");
+                    } else if (currentYearComparison < 0) {
+                        yeareCompare.innerHTML = `มีนักเตะลดลง<br><hr>${currentYearComparison}`;
+                        yeareCompare.classList.add("red", "arrow-down");
+                        yeareCompare.classList.remove("green", "arrow-up");
+                    } else {
+                        yeareCompare.classList.remove("indicator", "green", "red","arrow-up","arrow-down");
+                        yeareCompare.innerHTML = `มีนักเตะเท่าเดิม<hr>0`;
+                    }
+                    yeareCompare.innerHTML += `<br><br><br><br><br>จากปีที่แล้ว`
+                    
+                    document.getElementById('teamsCount').innerHTML = `จำนวนทีมสโมสร <br><hr>${data.teamsCount}`;
+                    const playerEachLevelArray = data.playerEachLevel.split(',').map(item => item.trim());
+                    const formattedPlayerEachLevel = playerEachLevelArray.join('<br>');
+                    document.getElementById('playerEachLevel').innerHTML = `จำนวนนักเตะต่ออันดับลีค<br><hr>${formattedPlayerEachLevel}`;
                 })
                 .catch(error => console.error('Error fetching dashboard data:', error));
 }
