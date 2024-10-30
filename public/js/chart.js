@@ -8,7 +8,7 @@ window.onload = function() {
 async function fetchDataByYear() {
   const year = document.getElementById('yearDropdown').value
   try {
-      const response = await fetch(`/dashboard/data/${year}`);
+      const response = await fetch(`/dashboard/data/fifa${year}`);
       if (!response.ok) {
           throw new Error('Network response was not ok');
       }

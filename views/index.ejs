@@ -197,14 +197,14 @@
         <div id="yearselect">
             <h2>Dashboard</h2>
             <select id="yearDropdown">
-                <option value="fifa22">2022</option>
-                <option value="fifa21">2021</option>
-                <option value="fifa20">2020</option>
-                <option value="fifa19">2019</option>
-                <option value="fifa18">2018</option>
-                <option value="fifa17">2017</option>
-                <option value="fifa16">2016</option>
-                <option value="fifa15">2015</option>
+                <option value="22">2022</option>
+                <option value="21">2021</option>
+                <option value="20">2020</option>
+                <option value="19">2019</option>
+                <option value="18">2018</option>
+                <option value="17">2017</option>
+                <option value="16">2016</option>
+                <option value="15">2015</option>
             </select>
         </div>
         <div id="blockinformation">
@@ -626,7 +626,8 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('totalPlayers').innerHTML = `จำนวนนักเตะทั้งหมด<br><hr>${data.totalPlayers}`;
-                    document.getElementById('avgMaxOverallAge').innerHTML = `ค่าพลังรวมของปี<br><hr>${data.avgMaxOverallAge}`;
+                    console.log(data.avgMaxOverallAge)
+                    document.getElementById('avgMaxOverallAge').innerHTML = `ค่าพลังรวมเฉลี่ยของปี<br><hr>${data.avgMaxOverallAge}`;
 
                     const currentYearComparison = parseInt(data.currentYearComparison, 10);
                     const yeareCompare = document.getElementById('currentYearComparison')

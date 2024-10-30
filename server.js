@@ -33,7 +33,7 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
 
     const queries = {
         totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
-        avgMaxOverallAge: `SELECT ROUND(AVG(wage_eur)::NUMERIC, 2) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
+        avgMaxOverallAge: `SELECT SUM(overall) AS sum_overall, COUNT(*) AS player_count FROM ${tableName}`,
         currentYearComparison: async () => {
             const currentYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft}')`);
             const previousYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft - 1}')`);
@@ -62,7 +62,7 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
     
         const dashboardData = {
             totalPlayers: totalPlayersResult.rows[0]?.totalplayers || 'N/A',
-            avgMaxOverallAge: avgMaxOverallAgeResult.rows[0]?.avgmaxoverallage || 'N/A',
+            avgMaxOverallAge: (avgMaxOverallAgeResult.rows[0]?.sum_overall / avgMaxOverallAgeResult.rows[0]?.player_count).toFixed(2) || 'N/A',
             currentYearComparison: `${currentYearComparisonResult.currentYear - currentYearComparisonResult.previousYear}`,
             teamsCount: teamsCountResult.rows[0]?.teamscount || 'N/A',
             playerEachLevel: playerEachLevelResult.rows.map(row => 
@@ -110,7 +110,7 @@ app.get("/api/searchPlayer", (req, res) => {
         SELECT ${columnList} FROM fifa${year}
         WHERE short_name ILIKE $1 OR long_name ILIKE $1;
     `;
-    console.log(`search/${year}`);
+    // console.log(`search/${year}`);
 
     pool.query(sqlQuery, [`%${query}%`], (error, results) => {
         if (error) {
@@ -176,6 +176,7 @@ app.delete('/delete-admin', async (req, res) => {
 
 app.get('/get-chart/:year', async (req, res) => {
     const year = req.params.year;
+    const yearTable = `fifa${year}`
     try {
         let pieData;
         let lineData;
@@ -186,7 +187,7 @@ app.get('/get-chart/:year', async (req, res) => {
 
         try {
             const sqlPie = `SELECT preferred_foot, COUNT(*) AS player_count
-                                FROM ${year}
+                                FROM ${yearTable}
                                 WHERE age IS NOT NULL
                                 GROUP BY preferred_foot
                                 ORDER BY player_count DESC
@@ -195,14 +196,14 @@ app.get('/get-chart/:year', async (req, res) => {
             pieData = result.rows || [];
 
             const sqlLine = `SELECT ROUND(AVG(wage_eur)::NUMERIC, 2) AS average_wage_eur, overall
-                            FROM ${year}
+                            FROM ${yearTable}
                             GROUP BY overall
                             ORDER BY overall DESC LIMIT 100`;
             result = await pool.query(sqlLine);
             lineData = result.rows || [];
 
             const sqlBar = `SELECT nationality_name, COUNT(*) AS player_count
-                                FROM ${year}
+                                FROM ${yearTable}
                                 GROUP BY nationality_name
                                 ORDER BY player_count DESC
                                 LIMIT 5; `;
@@ -210,7 +211,7 @@ app.get('/get-chart/:year', async (req, res) => {
             barData = result.rows || [];
 
             const sqlDoughnut = `SELECT club_position, COUNT(club_position) AS counts
-                            FROM ${year}
+                            FROM ${yearTable}
                             WHERE club_position IS NOT NULL AND club_position NOT IN ('SUB','RES')
                             GROUP BY club_position
                             ORDER BY counts DESC
@@ -224,14 +225,14 @@ app.get('/get-chart/:year', async (req, res) => {
                             ROUND(AVG(dribbling)::NUMERIC,2) AS avgdrib,
                             ROUND(AVG(physic)::NUMERIC,2) AS avgphysic,
                             ROUND(AVG(passing)::NUMERIC,2) AS avgpassing
-                            FROM ${year}
+                            FROM ${yearTable}
                             GROUP BY preferred_foot`;
             result = await pool.query(sqlRadar);
             radarData = result.rows || [];
 
             const sqlLine2 = `SELECT league_name, ROUND(AVG(height_cm)::NUMERIC,1) AS avgheight
                                 , ROUND(AVG(weight_kg)::NUMERIC,1) AS avgweight
-                                FROM ${year}
+                                FROM ${yearTable}
                                 WHERE league_name IN ('French Ligue 1','English Premier League',
                                 'Italian Serie A','German 1. Bundesliga','Spain Primera Division')
                                 GROUP BY league_name`;
