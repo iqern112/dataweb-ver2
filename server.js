@@ -33,7 +33,7 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
 
     const queries = {
         totalPlayers: `SELECT COUNT(*) AS totalPlayers FROM ${tableName}`,
-        avgMaxOverallAge: `SELECT AVG(overall) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
+        avgMaxOverallAge: `SELECT ROUND(AVG(wage_eur)::NUMERIC, 2) AS avgMaxOverallAge FROM ${tableName} GROUP BY age ORDER BY avgMaxOverallAge DESC LIMIT 1`,
         currentYearComparison: async () => {
             const currentYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft}')`);
             const previousYearExists = await pool.query(`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_tables WHERE tablename = 'fifa${fft - 1}')`);
@@ -49,7 +49,8 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
             return { currentYear, previousYear };
         },
         teamsCount: `SELECT COUNT(DISTINCT club_name) AS teamsCount FROM ${tableName}`,
-        playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level`
+        playerEachLevel: `SELECT league_level, COUNT(*) AS playerCount FROM ${tableName} GROUP BY league_level
+                            ORDER BY playerCount DESC`
     };
     
     try {
@@ -62,20 +63,18 @@ app.get('/api/dashboard-data/:year', async (req, res) => {
         const dashboardData = {
             totalPlayers: totalPlayersResult.rows[0]?.totalplayers || 'N/A',
             avgMaxOverallAge: avgMaxOverallAgeResult.rows[0]?.avgmaxoverallage || 'N/A',
-            currentYearComparison: `${currentYearComparisonResult.currentYear} / ${currentYearComparisonResult.previousYear}`,
+            currentYearComparison: `${currentYearComparisonResult.currentYear - currentYearComparisonResult.previousYear}`,
             teamsCount: teamsCountResult.rows[0]?.teamscount || 'N/A',
             playerEachLevel: playerEachLevelResult.rows.map(row => 
                 `${row.league_level || 'No level'}: ${row.playercount || 0}`
             ).join(', ')
         };
-
         res.json(dashboardData);
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 
 // Endpoint to get player data based on year for initial display
 app.get('/api/player-data/:year', async (req, res) => {
