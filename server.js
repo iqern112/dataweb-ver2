@@ -13,11 +13,16 @@ app.use(express.urlencoded({extended:false}));
 
 // การเชื่อมต่อฐานข้อมูล PostgreSQL
 const pool = new Pool({
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_NAME,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        database: process.env.DB_NAME,
+        ssl: {
+            rejectUnauthorized: false
+        }
+
+        
 });
 
 // ฟังก์ชันสำหรับคิวรี่ข้อมูล nationality
