@@ -174,7 +174,7 @@
     <div class="header">
         <div class="logo">FIFA(P)INFO</div>
         <div class="nav-buttons">
-            <button id="edit" onclick="showedit()">Edit</button>
+            <button id="edit" onclick="showedit()" style="display: none;">Edit</button>
             <button id="statusBtn">Guest</button>
             <button id="loginBtn" onclick="showLoginPopup()">Login</button>
         </div>
@@ -473,49 +473,57 @@ function closeEdit(){
 }
 
 
-        function showLoginPopup() {
-            console.log('showLoginPopup')
-            document.getElementById('loginPopup').style.display = 'block';
-        }
+function showLoginPopup() {
+    console.log('showLoginPopup');
+    document.getElementById('loginPopup').style.display = 'block';
+}
 
-        function closePopup() {
-            document.getElementById("loginPopup").style.display = "none";
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-        }
+function closePopup() {
+    document.getElementById("loginPopup").style.display = "none";
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+}
 
-        function logout() {
-            document.getElementById("statusBtn").innerText = "Guest";
-            document.getElementById("loginBtn").innerText = "Login";
-            document.getElementById("loginBtn").onclick = showLoginPopup;
-            document.getElementById("username").value = "";
-            document.getElementById("password").value = "";
-        }
+function logout() {
+    document.getElementById("statusBtn").innerText = "Guest";
+    document.getElementById("loginBtn").innerText = "Login";
+    document.getElementById("loginBtn").onclick = showLoginPopup;
 
-        async function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    // ซ่อนปุ่ม Edit เมื่อออกจากระบบ
+    document.getElementById("edit").style.display = "none";
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            });
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+}
 
-            const result = await response.json();
-            if (result.success) {
-                document.getElementById("statusBtn").innerText = "Admin";
-                document.getElementById("loginBtn").innerText = "Logout";
-                document.getElementById("loginBtn").onclick = logout;
-            } else {
-                alert("เข้าสู่ระบบไม่สำเร็จ");
-                document.getElementById("username").value = "";
-                document.getElementById("password").value = "";
-            }
-            document.getElementById('loginPopup').style.display = 'none';
-        }
+async function login() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    const response = await fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, password })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+        document.getElementById("statusBtn").innerText = "Admin";
+        document.getElementById("loginBtn").innerText = "Logout";
+        document.getElementById("loginBtn").onclick = logout;
+
+        // แสดงปุ่ม Edit เมื่อเข้าสู่ระบบสำเร็จ
+        document.getElementById("edit").style.display = "inline-block";
+    } else {
+        alert("เข้าสู่ระบบไม่สำเร็จ");
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+    }
+    document.getElementById('loginPopup').style.display = 'none';
+}
+
 
         function showSection(sectionId) {
     // ซ่อนทุก sections
@@ -793,7 +801,7 @@ function sortTable(columnName, order) {
 
 // เรียก loadPlayerData ครั้งแรกเมื่อเปิดหน้า playerinfo
 // document.addEventListener('DOMContentLoaded', loadPlayerData);
-
+  
         document.addEventListener('DOMContentLoaded', () => {
             // SelectColumns();
             const currentSection = localStorage.getItem('currentSection') || 'dashboard';
