@@ -145,7 +145,7 @@ app.post('/add-admin', async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        await pool.query("INSERT INTO users (username, password) VALUES ($1, $2)", [username, password]);
+        await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username, password]);
         res.json({ message: "Admin added successfully" });
     } catch (error) {
         console.error(error);
